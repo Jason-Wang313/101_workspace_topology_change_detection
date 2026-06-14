@@ -1,9 +1,17 @@
-# Child Status 101
+# Child Status
 
-Current stage: ICLR main gate terminal
-Last update: 2026-06-13 10:31:39 +0100
+Paper: 101 workspace_topology_change_detection
+
+Status: SUCCESS_STRONG_REVISE
+
+Hardening version: v4
+
+Last update: 2026-06-14 23:06:04 +0100
+
 PDF: C:/Users/wangz/Downloads/101.pdf
+
 GitHub: https://github.com/Jason-Wang313/101_workspace_topology_change_detection
-Submission-hardening version: v3
-Terminal decision: KILL_ARCHIVE
-ICLR main ready: no
+
+Evidence: local workspace-topology benchmark with strong baselines, ablations, stress sweep, uncertainty, failure cases, generated figures, and generated tables.
+
+ICLR main ready: no. The local mechanism is supported, but external robotics validation is still missing.

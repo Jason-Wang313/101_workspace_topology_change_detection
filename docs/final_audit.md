@@ -1,12 +1,21 @@
 # Final Audit
 
-1. Chosen thesis: Workspace Topology Change Detection explores `Detect topology changes in supports, passages, and occlusions before planning fails.` for robot scene understanding.
-2. ICLR-main decision: KILL_ARCHIVE.
-3. Submission-hardening version: v3.
-4. Reason: synthetic-only, template-generated evidence cannot support ICLR main-conference robotics claims.
-5. Closest hostile prior work: see `docs/hostile_prior_work.md`, `docs/hostile_prior_work_100_cards.csv`, and `docs/hostile_reviewer_response.md`.
-6. Reproducibility: synthetic code runs, but no real robot or high-fidelity benchmark is reproduced.
-7. Claim-validity status: main-conference claims killed; archive memo retained.
-8. Exact Downloads PDF path: `C:/Users/wangz/Downloads/101.pdf`
-9. GitHub URL: https://github.com/Jason-Wang313/101_workspace_topology_change_detection
-10. Confirmation: no visible Desktop copy was requested or made.
+Paper 101 v4 was rebuilt as a workspace-topology evidence audit.
+
+## Evidence Audit
+
+The new benchmark evaluates action-conditioned topology-change detection across tasks, change families, splits, methods, and seeds. The proposed method beats `topological_slam_tamp` on combined-stress success, invalid-plan rate, collision/trap rate, topology F1, and detection latency.
+
+## Terminal Decision
+
+STRONG_REVISE.
+
+The mechanism is promising enough to keep alive as an ICLR-main-target research project. It is not submission-ready and must not be framed as validated robotics deployment.
+
+## Verification Targets
+
+- Re-run: `python src\run_experiment.py`.
+- Main table: `results/combined_stress_table.tex`.
+- Ablation table: `results/ablation_table.tex`.
+- Pairwise table: `results/pairwise_decision_table.tex`.
+- PDF target: `C:/Users/wangz/Downloads/101.pdf`.

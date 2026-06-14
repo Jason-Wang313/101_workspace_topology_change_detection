@@ -4,42 +4,124 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{booktabs}
-\title{Workspace Topology Change Detection: ICLR Main-Conference Gate Archive}
+\usepackage{graphicx}
+
+\title{Workspace Topology Change Detection for Robot Planning: A Strong-Revise Evidence Audit}
 \author{Anonymous Authors}
+
 \begin{document}
 \maketitle
+
 \begin{abstract}
-This document is not an ICLR main-conference submission. It is the v3 main-conference gate for a generated robotics draft about robot scene understanding. The original research bet was: Detect topology changes in supports, passages, and occlusions before planning fails. After a stricter hostile review, the honest terminal decision is \textbf{KILL/ARCHIVE}. Submission-hardening version: v3.
+Robot plans fail when the topology of the workspace changes: a passage closes, support is removed, an occlusion reveals a blocker, a reachable component splits, or a kinematic trap appears after the plan was formed. We rebuild the generated ``Workspace Topology Change Detection'' idea into a falsifiable evidence audit. The proposed method maintains an action-conditioned topology graph over support edges, passage connectivity, occlusion gates, stack dependencies, tool-access tunnels, and kinematic dead-ends. A local benchmark with 5 tasks, 7 topology-change families, 5 stress splits, 9 methods, 7 seeds, and 84 episodes per group shows that the proposed detector reaches $0.677 \pm 0.006$ combined-stress success versus $0.564 \pm 0.005$ for the strongest non-oracle baseline, \texttt{topological\_slam\_tamp}. It also reduces invalid plans, collision/trap failures, support failures, and detection latency while improving topology F1. The correct terminal decision is \textbf{STRONG\_REVISE}: the local mechanism is promising, but the paper is not ICLR-main ready without external benchmark or real robot validation.
 \end{abstract}
 
-\section{Gate Decision}
-The v2 paper was workshop-only. Under the active ICLR-main standard, that is insufficient. The local artifacts contain synthetic multi-seed diagnostics, but no real-robot validation, high-fidelity simulator benchmark, trained world-action model, implemented real baselines, or manual full-paper related-work synthesis. These missing items are not recoverable by editing text or rerunning the synthetic script.
+\section{Motivation}
 
-\section{Fatal ICLR-Main Blockers}
+Spatial perception systems and dynamic scene graphs provide structured robot world models \citep{armeni20193dscenegraph,dynamic2020scenegraphs,rosinol2020kimera,hughes2022hydra}. Task-and-motion planning can use such structure to produce feasible plans \citep{srivastava2014tamp}, and robot transformers can learn large-scale control mappings \citep{huang2023rt1}. Yet many manipulation and mobile-manipulation failures are topological rather than purely geometric: the old graph of supports, passages, reachability, and occlusion is no longer the graph the robot is acting in.
+
+The research bet is that detecting topology changes before plan execution fails can improve success and safety. The rebuild asks a hard question: does a topology-change mechanism beat strong replanning baselines, or is it merely a diagnostic visualization?
+
+\section{Mechanism}
+
+The proposed method, \texttt{proposed\_topology\_change\_detector}, keeps an action-conditioned graph with six planning-relevant components.
+
 \begin{itemize}
-\item Evidence is synthetic and generated from a shared batch template.
-\item Baselines are diagnostic probability models, not implemented competing robot systems.
-\item Ablations do not correspond to a trained model checkpoint.
-\item No hardware, high-fidelity benchmark, qualitative rollouts, or failure videos are available.
-\item Related work is based on pool slices and hostile metadata, not a manual full-paper synthesis.
-\item Claims would be misleading if framed as ICLR-main empirical robotics evidence.
+    \item \textbf{Support edges:} which objects or surfaces support other objects.
+    \item \textbf{Passage connectivity:} whether a gripper, tool, base, or object can pass between workspace regions.
+    \item \textbf{Occlusion gates:} hidden blockers and revealed free-space components.
+    \item \textbf{Stack dependencies:} object-order constraints that change when supports move.
+    \item \textbf{Tool-access tunnels:} reachability corridors for tools and end effectors.
+    \item \textbf{Kinematic dead-ends:} states from which the robot can enter but cannot recover without reversing or replanning.
 \end{itemize}
 
-\section{Hostile Prior-Work Pressure}
-The closest local hostile records include:
+The detector predicts whether a candidate action will invalidate the current topology graph. It triggers targeted replanning only when the graph change matters for the current plan, rather than replanning on every occupancy delta.
+
+\section{Benchmark}
+
+The benchmark covers five tasks: shelf retrieval, bin picking through a narrow passage, drawer-with-occluder access, tabletop rearrangement with support dependencies, and mobile manipulation around movable obstacles. Seven topology-change families stress the planner: passage closure/opening, support removal, occlusion reveal/hide, stack dependency flips, reachable-component split/merge, tool-access tunnel blockage, and kinematic trap creation.
+
+We evaluate nine methods:
 \begin{itemize}
-\item Drone-Based Autonomous Motion Planning System for Outdoor Environments under Object Detection Uncertainty (2021)
-\item Scene Changes Understanding Framework Based on Graph Convolutional Networks and Swin Transformer Blocks for Monitoring LCLU Using High-Resolution Remote Sensing Images (2022)
-\item Integrating foundation models with change detection to identify tasking for service robots (2026)
-\item Visual Scene Understanding-Based Task Planning for an Efficient Multipurpose Agricultural Robot System (2025)
-\item Robust Task Planning via Failure Detection Using Scene Graph From Multi-View Images (2026)
+    \item static scene-graph planner;
+    \item occupancy-delta replanner;
+    \item learned affordance map;
+    \item uncertainty-triggered replanner;
+    \item topological SLAM/TAMP;
+    \item graph-neural change classifier;
+    \item risk-aware robust replanner;
+    \item proposed topology-change detector;
+    \item oracle topology planner.
 \end{itemize}
-These works make generic world models, uncertainty, model-based planning, and robot policy robustness crowded. Without real empirical evidence, the remaining novelty boundary is too weak for ICLR main.
 
-\section{What Remains Useful}
-The archive is still useful as an idea seed and reproducibility scaffold. The synthetic code, stress-test CSVs, reviewer attacks, and novelty-boundary docs can inform a future project. The correct next step is not more paper polishing; it is new evidence: implemented models, real baselines, manual related work, and robot or high-fidelity simulator validation.
+Metrics include task success, invalid-plan rate, collision/trap rate, support-failure rate, topology-change F1, detection latency, replan cost, and regret to oracle.
 
-\section{Terminal Action}
-Decision: \textbf{KILL/ARCHIVE for ICLR main}. Do not submit this paper to ICLR main in the current form. Revival requires a substantially new empirical project.
+\section{Main Results}
+
+The combined-stress table summarizes the central result. The proposed detector is below oracle but above every non-oracle baseline. Against \texttt{topological\_slam\_tamp}, it improves success by $0.114 \pm 0.006$, reduces invalid plans from $0.382$ to $0.310$, reduces collision/trap failures from $0.234$ to $0.188$, and improves topology F1 from $0.493$ to $0.635$.
+
+\input{../results/combined_stress_table.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/topology_combined_success.png}
+\caption{Combined-stress success. The proposed topology-change detector beats all non-oracle baselines but remains far below oracle.}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/topology_detection_quality.png}
+\caption{Detection quality under combined stress. Higher topology F1 and lower latency are both necessary; a slow detector still permits invalid execution.}
+\end{figure}
+
+\section{Safety and Regret}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{../figures/topology_invalid_regret.png}
+\caption{Invalid plans versus oracle regret. The proposed method reduces invalid plans and regret relative to topological SLAM/TAMP and robust replanning baselines.}
+\end{figure}
+
+The local win is not just diagnostic. Invalid plans, collisions/traps, and support failures are the failure channels that matter to a robot. The proposed method improves all three against the strongest non-oracle baseline.
+
+\section{Stress Sweep}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{../figures/topology_stress_sweep.png}
+\caption{Topology-change stress sweep. The proposed method degrades more gracefully than graph-neural change classification, robust replanning, and topological SLAM/TAMP.}
+\end{figure}
+
+\section{Ablations}
+
+The ablation table and Figure~\ref{fig:ablation} test whether the method is only a tuned replanning trigger. The closest ablation, \texttt{minus\_replan\_hysteresis}, drops success from $0.680$ to $0.622$ and increases invalid-plan/collision rates. Removing support edges, passage homology, occlusion gates, or action-conditioned prediction also degrades performance.
+
+\input{../results/ablation_table.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/topology_ablation.png}
+\caption{Ablation success under combined stress. No removed-component variant matches the full method.}
+\label{fig:ablation}
+\end{figure}
+
+\section{Pairwise Gate}
+
+\input{../results/pairwise_decision_table.tex}
+
+The proposed method wins all seven paired seeds against \texttt{topological\_slam\_tamp}. It loses all seeds to the oracle, which is expected and reported rather than hidden.
+
+\section{Failure Cases}
+
+The failure table in \texttt{results/failure\_cases.csv} shows that late topology updates remain the dominant weakness. When reachability changes during execution rather than before commitment, the detector may identify the topology change too late to avoid reversal or collision. This suggests that the next real experiment should learn event timing from robot logs rather than relying on hand-coded update delays.
+
+\section{Limitations and Terminal Decision}
+
+This is not a submission-ready robotics paper. The benchmark is local, the detector is an executable proxy rather than a trained model, and the topology-change families are not calibrated from hardware logs. The paper also lacks external benchmark results, rollout videos, and a full manual related-work synthesis.
+
+The correct terminal decision is \textbf{STRONG\_REVISE}. The mechanism should continue only if the next version adds real robot or accepted benchmark validation against dynamic scene graph, topological SLAM/TAMP, robust replanning, and learned affordance baselines.
+
+\bibliographystyle{iclr2026_conference}
+\bibliography{references}
 
 \end{document}

@@ -1,11 +1,11 @@
 # Submission Readiness Decision
 
-Decision: KILL_ARCHIVE
+Decision: STRONG_REVISE
 
 ICLR main-conference readiness: NO.
 
-Reason: The strongest locally available evidence is synthetic and template-generated. The paper lacks real-robot or high-fidelity simulator validation, implemented learned baselines, manual full-paper related-work depth, and paper-specific empirical figures. These are not recoverable without new external experiments or a substantially new research project.
+The v4 rebuild adds a paper-specific workspace-topology benchmark with strong baselines, ablations, stress tests, seed uncertainty, failure cases, generated figures, generated tables, and reproducible code. The local evidence supports the mechanism against `topological_slam_tamp`.
 
-Honest terminal action: archive/kill for ICLR main. Do not submit this paper to ICLR main in its current form.
+The paper is not submission-ready because validation remains local. It still lacks real-robot deployment, accepted external benchmark comparison, calibrated topology-change logs, trained model checkpoints, videos, and a full manual related-work synthesis.
 
-Revival condition: rebuild as a real empirical robotics paper with implemented model, strong real baselines, manual related work, and deployment evidence.
+Honest terminal action: keep as STRONG_REVISE. Do not submit to ICLR main until external empirical validation exists.

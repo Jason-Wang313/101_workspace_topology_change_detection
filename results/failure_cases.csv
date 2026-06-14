@@ -1,0 +1,9 @@
+case_id,task,family,proposed_success,strongest_baseline,baseline_success,success_gap,proposed_invalid_plan,proposed_collision_trap,lesson
+1,drawer_occluder_access,occlusion_reveal_hide,0.6378,topological_slam_tamp,0.5816,0.0561,0.3146,0.1548,late topology updates still fail when reachability changes during execution rather than before commitment
+2,drawer_occluder_access,tool_access_tunnel_blockage,0.6582,topological_slam_tamp,0.5918,0.0663,0.2993,0.1276,late topology updates still fail when reachability changes during execution rather than before commitment
+3,mobile_manipulation_movable_obstacles,kinematic_trap_creation,0.6616,topological_slam_tamp,0.5901,0.0714,0.3180,0.2075,late topology updates still fail when reachability changes during execution rather than before commitment
+4,mobile_manipulation_movable_obstacles,passage_closure_opening,0.6480,topological_slam_tamp,0.5765,0.0714,0.2806,0.1990,late topology updates still fail when reachability changes during execution rather than before commitment
+5,shelf_retrieval,tool_access_tunnel_blockage,0.6684,topological_slam_tamp,0.5969,0.0714,0.3044,0.1684,late topology updates still fail when reachability changes during execution rather than before commitment
+6,shelf_retrieval,kinematic_trap_creation,0.6786,topological_slam_tamp,0.6003,0.0782,0.3027,0.1956,late topology updates still fail when reachability changes during execution rather than before commitment
+7,shelf_retrieval,occlusion_reveal_hide,0.6378,topological_slam_tamp,0.5595,0.0782,0.3112,0.1820,late topology updates still fail when reachability changes during execution rather than before commitment
+8,support_dependency_rearrangement,passage_closure_opening,0.6463,topological_slam_tamp,0.5663,0.0799,0.3367,0.1990,late topology updates still fail when reachability changes during execution rather than before commitment

@@ -1,19 +1,20 @@
 # Experiment Rigor Checklist
 
-## v2 Synthetic Rigor
-- [x] Multiple seeds.
-- [x] Error bars.
-- [x] Stronger synthetic baselines.
-- [x] Ablations.
-- [x] Stress tests.
-- [x] Negative cases.
-
-## ICLR Main Bar
-- [ ] Real-robot validation.
-- [ ] High-fidelity simulator benchmark.
-- [ ] Implemented learned model.
-- [ ] Implemented real competing baselines.
-- [ ] Manual related-work synthesis.
-- [ ] Paper-specific qualitative figures.
-
-Decision: fail ICLR main empirical-rigor gate; archive.
+- [x] Paper-specific topology-change benchmark.
+- [x] Multiple manipulation/mobile-manipulation tasks.
+- [x] Multiple topology-change families.
+- [x] Multiple stress splits.
+- [x] Strong baselines including topological SLAM/TAMP, graph neural change classification, robust replanning, uncertainty replanning, and occupancy deltas.
+- [x] Oracle upper bound.
+- [x] Seven seeds.
+- [x] Uncertainty intervals.
+- [x] Pairwise seed-level comparison against strongest baseline.
+- [x] Stress sweep.
+- [x] Core ablations.
+- [x] Failure cases.
+- [x] Generated figures and LaTeX tables.
+- [x] Honest terminal gate.
+- [ ] Real robot validation.
+- [ ] External benchmark validation.
+- [ ] Trained checkpoint/model card.
+- [ ] Rollout videos.
