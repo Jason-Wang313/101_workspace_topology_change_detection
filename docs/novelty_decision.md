@@ -1,7 +1,7 @@
 # Novelty Decision
 
-Chosen thesis: Workspace Topology Change Detection turns the seed bet into a mechanism: Detect topology changes in supports, passages, and occlusions before planning fails.
+Decision: conditionally promising.
 
-New central mechanism: Workspace topology change detection keeps action-critical alternatives explicit until a physical observation collapses them.
+The v4 evidence supports keeping the idea alive as STRONG_REVISE. The mechanism is more specific than generic scene-graph change detection because the topology graph is action-conditioned and tied to invalid-plan prevention.
 
-Decision: proceed as a revise/workshop-strength ICLR-style draft with synthetic but runnable evidence.
+The novelty is not enough for ICLR main without external validation and a deeper related-work survey.

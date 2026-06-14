@@ -1,8 +1,9 @@
 # Reviewer Attacks
 
-- This is only uncertainty with different words.
-- The evidence is synthetic and may not transfer to real hardware.
-- The hostile prior work already contains contact-aware world models.
-- The proposed mechanism may be too specialized for broad ICLR interest.
-
-Response: the paper must emphasize branch semantics, explicit failure conditions, and honest synthetic scope.
+1. The topology-change families are hand-designed and not calibrated from real robot logs.
+2. The proposed detector is an executable proxy, not a trained graph model.
+3. Topological SLAM/TAMP and dynamic scene-graph systems may close the gap under real data.
+4. Detection F1 is useful, but reviewers will demand real closed-loop rollouts.
+5. The oracle gap remains large: `0.677` proposed success versus `0.829` oracle success under combined stress.
+6. Replanning cost is abstract rather than measured wall-clock robot time.
+7. The paper still needs a full manual related-work synthesis.

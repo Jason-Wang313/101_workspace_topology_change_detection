@@ -1,13 +1,23 @@
 # Novelty Boundary Map
 
 ## Crowded Territory
-- Bigger data/model scaling.
-- New benchmark only.
-- Generic active learning or uncertainty.
-- Combining a planner with a learned policy without a new state/action object.
+
+- Static scene graphs.
+- Occupancy-grid change detection.
+- Dynamic scene graphs.
+- Topological SLAM.
+- Generic uncertainty-triggered replanning.
+- Robust TAMP without explicit topology-change diagnosis.
+- Learned affordance maps without action-conditioned graph updates.
 
 ## Claimed Boundary
-Workspace topology change detection keeps action-critical alternatives explicit until a physical observation collapses them.
 
-## What Would Falsify The Claim
-If observed-only baselines match the adverse-mode coverage and closed-loop success of the proposed branch-aware mechanism, the paper should be revised or killed.
+The local contribution is action-conditioned workspace topology-change detection: support edges, passage connectivity, occlusion gates, stack dependencies, tool tunnels, and kinematic traps are tracked as planning-relevant graph changes.
+
+## Current Evidence
+
+The proposed method locally beats topological SLAM/TAMP, graph-neural change classification, robust replanning, and occupancy-delta baselines under combined stress while reducing invalid plans and collision/trap failures.
+
+## Boundary Still Not Proven Externally
+
+The claim is not yet proven on robot hardware, accepted benchmarks, or real dynamic-scene logs.

@@ -1,16 +1,49 @@
-Submission-hardening experiment for paper 101 workspace_topology_change_detection
-Seven seeds, 600 episodes per seed, strong baselines, ablations, stress sweep, and negative cases.
-observed_only_behavior_clone hidden_mode_shift mean_success=0.4002 ci95=0.0114 tail=0.5998
-observed_only_behavior_clone combined_stress mean_success=0.3083 ci95=0.0195 tail=0.6917
-data_augmentation_wam hidden_mode_shift mean_success=0.4814 ci95=0.0115 tail=0.5186
-data_augmentation_wam combined_stress mean_success=0.4176 ci95=0.0141 tail=0.5824
-scalar_uncertainty_planner hidden_mode_shift mean_success=0.5588 ci95=0.0116 tail=0.4412
-scalar_uncertainty_planner combined_stress mean_success=0.5067 ci95=0.0160 tail=0.4933
-ensemble_disagreement_planner hidden_mode_shift mean_success=0.6010 ci95=0.0205 tail=0.3990
-ensemble_disagreement_planner combined_stress mean_success=0.5293 ci95=0.0090 tail=0.4707
-conformal_risk_filter hidden_mode_shift mean_success=0.6040 ci95=0.0194 tail=0.3960
-conformal_risk_filter combined_stress mean_success=0.5564 ci95=0.0142 tail=0.4436
-proposed_branch_mechanism hidden_mode_shift mean_success=0.6850 ci95=0.0067 tail=0.3150
-proposed_branch_mechanism combined_stress mean_success=0.6433 ci95=0.0089 tail=0.3567
-oracle_branch_upper_bound hidden_mode_shift mean_success=0.7531 ci95=0.0165 tail=0.2469
-oracle_branch_upper_bound combined_stress mean_success=0.7219 ci95=0.0131 tail=0.2781
+Paper 101 workspace_topology_change_detection evidence rebuild
+Design: 5 tasks x 7 topology-change families x 5 splits x 9 methods, 7 seeds, 84 episodes/group.
+Terminal decision: STRONG_REVISE
+Rationale: local topology-change evidence supports the mechanism, but no real robot or external benchmark validation is available
+
+Combined-stress ranking:
+oracle_topology_planner: success=0.829 +/- 0.006, invalid=0.241, collision=0.136, support=0.052, topo_f1=0.780, latency=0.449, regret=0.000
+proposed_topology_change_detector: success=0.677 +/- 0.006, invalid=0.310, collision=0.188, support=0.093, topo_f1=0.635, latency=0.565, regret=0.152
+topological_slam_tamp: success=0.564 +/- 0.005, invalid=0.382, collision=0.234, support=0.130, topo_f1=0.493, latency=0.685, regret=0.266
+graph_neural_change_classifier: success=0.533 +/- 0.007, invalid=0.398, collision=0.247, support=0.152, topo_f1=0.459, latency=0.721, regret=0.296
+risk_aware_robust_replanner: success=0.473 +/- 0.006, invalid=0.420, collision=0.225, support=0.153, topo_f1=0.347, latency=0.763, regret=0.356
+learned_affordance_map: success=0.443 +/- 0.008, invalid=0.468, collision=0.292, support=0.197, topo_f1=0.308, latency=0.837, regret=0.386
+uncertainty_triggered_replanner: success=0.432 +/- 0.008, invalid=0.445, collision=0.252, support=0.178, topo_f1=0.297, latency=0.814, regret=0.397
+occupancy_delta_replanner: success=0.412 +/- 0.006, invalid=0.452, collision=0.284, support=0.191, topo_f1=0.327, latency=0.811, regret=0.417
+static_scene_graph_planner: success=0.354 +/- 0.005, invalid=0.506, collision=0.324, support=0.220, topo_f1=0.211, latency=0.903, regret=0.475
+
+Gate outcomes:
+success_gate: True
+safety_gate: True
+diagnostic_gate: True
+pairwise_gate: True
+ablation_gate: True
+success_margin_vs_strongest: 0.1137512147716232
+invalid_plan_delta_vs_strongest: -0.07172011661807581
+collision_trap_delta_vs_strongest: -0.04557823129251706
+topology_f1_delta_vs_strongest: 0.14207968901846463
+latency_delta_vs_strongest: -0.12029289634350715
+ablation_margin_vs_best_removed_component: 0.057628765792031134
+strongest_non_oracle_baseline: topological_slam_tamp
+best_removed_component: minus_replan_hysteresis
+
+Pairwise proposed comparisons:
+graph_neural_change_classifier: diff=0.145 +/- 0.009, wins=7/7, decision=proposed_better
+learned_affordance_map: diff=0.234 +/- 0.013, wins=7/7, decision=proposed_better
+occupancy_delta_replanner: diff=0.266 +/- 0.011, wins=7/7, decision=proposed_better
+oracle_topology_planner: diff=-0.152 +/- 0.009, wins=0/7, decision=not_decisive
+risk_aware_robust_replanner: diff=0.204 +/- 0.009, wins=7/7, decision=proposed_better
+static_scene_graph_planner: diff=0.323 +/- 0.006, wins=7/7, decision=proposed_better
+topological_slam_tamp: diff=0.114 +/- 0.006, wins=7/7, decision=proposed_better
+uncertainty_triggered_replanner: diff=0.245 +/- 0.010, wins=7/7, decision=proposed_better
+
+Ablations:
+full_topology_change_detector: success=0.680 +/- 0.006, invalid=0.312, collision=0.185, note=all components
+minus_replan_hysteresis: success=0.622 +/- 0.007, invalid=0.322, collision=0.190, note=over-triggers replanning
+minus_occlusion_gates: success=0.614 +/- 0.008, invalid=0.353, collision=0.211, note=removes occlusion gate state
+minus_support_edges: success=0.607 +/- 0.009, invalid=0.352, collision=0.215, note=removes support-edge tracking
+minus_passage_homology: success=0.591 +/- 0.009, invalid=0.358, collision=0.217, note=removes passage connectivity features
+minus_action_conditioned_prediction: success=0.572 +/- 0.006, invalid=0.371, collision=0.224, note=predicts topology without candidate action context
+occupancy_delta_only: success=0.430 +/- 0.006, invalid=0.445, collision=0.279, note=uses geometry deltas without topology semantics

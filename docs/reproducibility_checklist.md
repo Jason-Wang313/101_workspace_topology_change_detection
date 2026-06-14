@@ -1,19 +1,17 @@
 # Reproducibility Checklist
 
-## What Reproduces
-- [x] `python src/run_experiment.py`
-- [x] `results/metrics.csv`
-- [x] `results/raw_seed_metrics.csv`
-- [x] `results/ablation_metrics.csv`
-- [x] `results/stress_sweep.csv`
-- [x] `results/negative_cases.csv`
-- [x] `paper/main.tex`
-- [x] Canonical PDF: `C:/Users/wangz/Downloads/101.pdf`
+- Code entry point: `src/run_experiment.py`.
+- Dependencies: `numpy`, `matplotlib`.
+- Deterministic base seed: `101_2026`.
+- Seeds: `0..6`.
+- Results directory: `results/`.
+- Figures directory: `figures/`.
+- Tables are generated from CSV outputs.
+- PDF can be rebuilt with two `pdflatex` passes in `paper/`.
 
-## What Does Not Reproduce
-- [ ] Real robot results.
-- [ ] High-fidelity benchmark runs.
-- [ ] Trained WAM checkpoints.
-- [ ] Competing learned baselines.
+## Known Limits
 
-This is reproducible as an archive memo and synthetic stress test, not as an ICLR-main robotics system paper.
+- The benchmark is local rather than hardware-calibrated.
+- Full trajectories are not stored to keep RAM and disk use light.
+- No external benchmark data is consumed.
+- No trained model checkpoint is released.

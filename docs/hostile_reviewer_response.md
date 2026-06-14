@@ -1,26 +1,17 @@
-        # Hostile Reviewer Response
+# Hostile Reviewer Response
 
-        Paper: 101 Workspace Topology Change Detection
+## Attack: This is not external robotics evidence.
 
-        ## Strongest Technical Threats
-        - Drone-Based Autonomous Motion Planning System for Outdoor Environments under Object Detection Uncertainty (2021)
-- Scene Changes Understanding Framework Based on Graph Convolutional Networks and Swin Transformer Blocks for Monitoring LCLU Using High-Resolution Remote Sensing Images (2022)
-- Integrating foundation models with change detection to identify tasking for service robots (2026)
-- Visual Scene Understanding-Based Task Planning for an Efficient Multipurpose Agricultural Robot System (2025)
-- Robust Task Planning via Failure Detection Using Scene Graph From Multi-View Images (2026)
-- Robust Scene Change Detection Using Visual Foundation Models and Cross-Attention Mechanisms (2025)
-- GRASPING TASK PLANNING ALGORITHM FOR DEXTEROUS HAND BASED ON SCENE UNDERSTANDING AND SEMANTIC INFORMATION. 295-306 (2026)
-- Vision-Based Semantic Segmentation in Scene Understanding for Autonomous Driving: Recent Achievements, Challenges, and Outlooks (2022)
+Response: Correct. The terminal result is STRONG_REVISE, not ready. The benchmark is paper-specific and rigorous locally, but it does not replace hardware or accepted external benchmarks.
 
-        ## ICLR Main Response
-        A hostile ICLR reviewer would be correct to reject this as a main-conference submission. The v2 paper has reproducible synthetic evidence and careful limitations, but it does not contain the real robot, high-fidelity simulator, learned model, or manual related-work depth needed for the ICLR main track.
+## Attack: Topological SLAM/TAMP is the real baseline.
 
-        ## Honest Action
-        The paper is marked `KILL_ARCHIVE`. This avoids converting a generated workshop-style idea into an overstated main-conference claim.
+Response: v4 includes `topological_slam_tamp` as the strongest non-oracle baseline. The proposed method beats it by `0.114 +/- 0.006` success under combined stress and reduces invalid plans, collision/trap failures, and detection latency.
 
-        ## What Would Be Needed To Revive
-        - Real robot or high-fidelity benchmark experiments.
-        - Implemented model and baselines, not synthetic probability tables.
-        - Manual full-paper related-work audit.
-        - Paper-specific writing and figures.
-        - Evidence that the core mechanism is learned and useful under deployment shift.
+## Attack: The result could be a diagnostic-only win.
+
+Response: The local evidence includes closed-loop success, invalid-plan rate, collision/trap rate, support failure, and regret, not only topology F1.
+
+## Attack: What is missing for submission?
+
+Response: External benchmark or robot validation, calibrated change events, trained checkpoint release, rollout videos, and deeper related-work synthesis.
