@@ -4,7 +4,7 @@ Paper: 101 workspace_topology_change_detection
 
 Previous v3 decision: KILL_ARCHIVE
 
-Current v4 gate verdict: STRONG_REVISE
+Current v4.1 gate verdict: STRONG_REVISE
 
 ## Gate Evidence
 
@@ -18,6 +18,8 @@ Current v4 gate verdict: STRONG_REVISE
 - Proposed vs strongest topology-F1 delta: `+0.142`.
 - Proposed vs strongest detection-latency delta: `-0.120`.
 - Full method vs best removed-component ablation margin: `+0.058`.
+- Maximum topology stress: proposed success `0.678` vs `0.549` for `topological_slam_tamp`.
+- Fresh rerun status: reproduced on 2026-06-15.
 
 ## Passed Local Gates
 

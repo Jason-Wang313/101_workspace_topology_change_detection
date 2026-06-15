@@ -16,7 +16,7 @@ The local contribution is action-conditioned workspace topology-change detection
 
 ## Current Evidence
 
-The proposed method locally beats topological SLAM/TAMP, graph-neural change classification, robust replanning, and occupancy-delta baselines under combined stress while reducing invalid plans and collision/trap failures.
+The proposed method locally beats topological SLAM/TAMP, graph-neural change classification, robust replanning, and occupancy-delta baselines under combined stress while reducing invalid plans and collision/trap failures. The 2026-06-15 continuation rerun reproduced this pattern.
 
 ## Boundary Still Not Proven Externally
 
