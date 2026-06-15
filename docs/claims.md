@@ -2,7 +2,7 @@
 
 ## Supported Local Claim
 
-Action-conditioned topology-change detection improves planning under changing supports, passages, occlusions, reachability components, tool-access tunnels, and kinematic traps.
+Action-conditioned topology-change detection improves planning under changing supports, passages, occlusions, reachability components, tool-access tunnels, and kinematic traps. The 2026-06-15 continuation rerun reproduced this local claim.
 
 ## Evidence
 
@@ -12,6 +12,7 @@ Action-conditioned topology-change detection improves planning under changing su
 - Proposed topology F1 is higher and detection latency is lower than the strongest baseline.
 - Pairwise proposed-vs-strongest success difference: `0.114 +/- 0.006`, winning `7/7` seeds.
 - Ablations removing support edges, passage homology, occlusion gates, action-conditioned prediction, or replan hysteresis reduce success or worsen risk.
+- Maximum topology stress remains positive for the proposed method: `0.678` success vs `0.549` for `topological_slam_tamp`.
 
 ## Scope
 

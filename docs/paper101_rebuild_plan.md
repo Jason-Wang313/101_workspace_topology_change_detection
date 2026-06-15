@@ -73,3 +73,7 @@ Use vectorized or aggregate group simulation and write summary tables directly. 
 Completed: 2026-06-14 23:06:04 +0100
 
 The benchmark was implemented and run. Terminal gate result: STRONG_REVISE. The proposed method beat `topological_slam_tamp` on combined-stress success, invalid-plan rate, collision/trap rate, topology F1, and detection latency, and no core ablation matched the full method. The paper remains not ICLR-main ready because external robot or accepted benchmark validation is missing.
+
+## Continuation Result
+
+Re-executed on 2026-06-15 under the Paper 101 ICLR-main submission-readiness plan. The result remained `STRONG_REVISE`: `proposed_topology_change_detector` beat `topological_slam_tamp` on combined-stress success (0.677 vs 0.564), improved invalid-plan/collision/support safety, improved topology F1 and detection latency, won the paired seed gate, and no removed-component ablation matched the full method. It still is not ICLR-main ready without external robot or accepted benchmark validation.

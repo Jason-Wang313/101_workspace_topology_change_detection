@@ -16,7 +16,7 @@ Action: require external manipulation/navigation validation before submission.
 
 ## Attack 3: Baselines are weak
 
-Verdict: partly addressed. v4 adds topological SLAM/TAMP, graph-neural change classifier, robust replanning, uncertainty-triggered replanning, learned affordance maps, occupancy deltas, static scene graphs, and oracle.
+Verdict: partly addressed. v4.1 retains topological SLAM/TAMP, graph-neural change classifier, robust replanning, uncertainty-triggered replanning, learned affordance maps, occupancy deltas, static scene graphs, and oracle.
 
 Action: keep as STRONG_REVISE because the baselines are stronger but still proxy systems.
 

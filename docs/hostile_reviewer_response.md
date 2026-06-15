@@ -6,7 +6,7 @@ Response: Correct. The terminal result is STRONG_REVISE, not ready. The benchmar
 
 ## Attack: Topological SLAM/TAMP is the real baseline.
 
-Response: v4 includes `topological_slam_tamp` as the strongest non-oracle baseline. The proposed method beats it by `0.114 +/- 0.006` success under combined stress and reduces invalid plans, collision/trap failures, and detection latency.
+Response: v4.1 includes `topological_slam_tamp` as the strongest non-oracle baseline. The proposed method beats it by `0.114 +/- 0.006` success under combined stress and reduces invalid plans, collision/trap failures, support failures, and detection latency.
 
 ## Attack: The result could be a diagnostic-only win.
 

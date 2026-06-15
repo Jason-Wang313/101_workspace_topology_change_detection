@@ -7,7 +7,8 @@
 - Results directory: `results/`.
 - Figures directory: `figures/`.
 - Tables are generated from CSV outputs.
-- PDF can be rebuilt with two `pdflatex` passes in `paper/`.
+- 2026-06-15 continuation log: `C:/Users/wangz/robotics_massive_pool_paper_factory/logs/101_workspace_topology_change_detection_continuation_rerun_20260615.log`.
+- PDF can be rebuilt with `pdflatex`, `bibtex`, and two final `pdflatex` passes in `paper/`.
 
 ## Known Limits
 

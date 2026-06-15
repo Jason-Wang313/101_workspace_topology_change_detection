@@ -5,15 +5,17 @@
 \usepackage{url}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{microtype}
+\raggedbottom
 
-\title{Workspace Topology Change Detection for Robot Planning: A Strong-Revise Evidence Audit}
+\title{Workspace Topology Change Detection for Robot Planning}
 \author{Anonymous Authors}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Robot plans fail when the topology of the workspace changes: a passage closes, support is removed, an occlusion reveals a blocker, a reachable component splits, or a kinematic trap appears after the plan was formed. We rebuild the generated ``Workspace Topology Change Detection'' idea into a falsifiable evidence audit. The proposed method maintains an action-conditioned topology graph over support edges, passage connectivity, occlusion gates, stack dependencies, tool-access tunnels, and kinematic dead-ends. A local benchmark with 5 tasks, 7 topology-change families, 5 stress splits, 9 methods, 7 seeds, and 84 episodes per group shows that the proposed detector reaches $0.677 \pm 0.006$ combined-stress success versus $0.564 \pm 0.005$ for the strongest non-oracle baseline, \texttt{topological\_slam\_tamp}. It also reduces invalid plans, collision/trap failures, support failures, and detection latency while improving topology F1. The correct terminal decision is \textbf{STRONG\_REVISE}: the local mechanism is promising, but the paper is not ICLR-main ready without external benchmark or real robot validation.
+Robot plans fail when the topology of the workspace changes: a passage closes, support is removed, an occlusion reveals a blocker, a reachable component splits, or a kinematic trap appears after the plan was formed. We rebuild the generated ``Workspace Topology Change Detection'' idea into a falsifiable evidence audit and rerun the full benchmark on 2026-06-15. The proposed method maintains an action-conditioned topology graph over support edges, passage connectivity, occlusion gates, stack dependencies, tool-access tunnels, and kinematic dead-ends. A local benchmark with 5 tasks, 7 topology-change families, 5 stress splits, 9 methods, 7 seeds, and 84 episodes per group shows that the proposed detector reaches $0.677 \pm 0.006$ combined-stress success versus $0.564 \pm 0.005$ for the strongest non-oracle baseline, \texttt{topological\_slam\_tamp}. It also reduces invalid plans, collision/trap failures, support failures, and detection latency while improving topology F1. The correct terminal decision is \textbf{STRONG\_REVISE}: the local mechanism is promising, but the paper is not ICLR-main ready without external benchmark or real robot validation.
 \end{abstract}
 
 \section{Motivation}
@@ -54,7 +56,7 @@ We evaluate nine methods:
     \item oracle topology planner.
 \end{itemize}
 
-Metrics include task success, invalid-plan rate, collision/trap rate, support-failure rate, topology-change F1, detection latency, replan cost, and regret to oracle.
+Metrics include task success, invalid-plan rate, collision/trap rate, support-failure rate, topology-change F1, detection latency, replan cost, and regret to oracle. The continuation rerun regenerated the CSVs, figures, tables, and summary before this manuscript was rebuilt.
 
 \section{Main Results}
 
@@ -119,9 +121,12 @@ The failure table in \texttt{results/failure\_cases.csv} shows that late topolog
 
 This is not a submission-ready robotics paper. The benchmark is local, the detector is an executable proxy rather than a trained model, and the topology-change families are not calibrated from hardware logs. The paper also lacks external benchmark results, rollout videos, and a full manual related-work synthesis.
 
-The correct terminal decision is \textbf{STRONG\_REVISE}. The mechanism should continue only if the next version adds real robot or accepted benchmark validation against dynamic scene graph, topological SLAM/TAMP, robust replanning, and learned affordance baselines.
+The correct terminal decision after the 2026-06-15 continuation rerun is \textbf{STRONG\_REVISE}. The mechanism should continue only if the next version adds real robot or accepted benchmark validation against dynamic scene graph, topological SLAM/TAMP, robust replanning, and learned affordance baselines.
 
+\begingroup
+\raggedright
 \bibliographystyle{iclr2026_conference}
 \bibliography{references}
+\endgroup
 
 \end{document}

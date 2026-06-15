@@ -1,10 +1,10 @@
 # 101 Workspace Topology Change Detection
 
-Submission-hardening version: v4
+Submission-hardening version: v4.1
 
 Terminal decision: STRONG_REVISE for an ICLR-main-target project, not submission-ready.
 
-Paper 101 was rebuilt from a template archive into a topology-change benchmark for contact-rich and mobile manipulation. The v4 evidence supports the local mechanism: action-conditioned topology-change detection improves success, invalid-plan rate, collision/trap rate, support-failure rate, topology F1, and detection latency relative to the strongest non-oracle baseline, `topological_slam_tamp`.
+Paper 101 was rebuilt from a template archive into a topology-change benchmark for contact-rich and mobile manipulation and rerun on 2026-06-15. The v4.1 evidence supports the local mechanism: action-conditioned topology-change detection improves success, invalid-plan rate, collision/trap rate, support-failure rate, topology F1, and detection latency relative to the strongest non-oracle baseline, `topological_slam_tamp`.
 
 ## Key Evidence
 
@@ -15,6 +15,7 @@ Paper 101 was rebuilt from a template archive into a topology-change benchmark f
 - Safety: proposed invalid-plan `0.310`, collision/trap `0.188`, support failure `0.093`; all below the strongest baseline.
 - Diagnostics: proposed topology F1 `0.635` and latency `0.565`; strongest baseline topology F1 `0.493` and latency `0.685`.
 - Ablation gate: full method success `0.680`; best removed-component ablation `minus_replan_hysteresis` success `0.622`.
+- Max stress: proposed success `0.678`, while `topological_slam_tamp` reaches `0.549`.
 
 ## Reproduce Evidence
 
@@ -22,10 +23,16 @@ Paper 101 was rebuilt from a template archive into a topology-change benchmark f
 python src\run_experiment.py
 ```
 
+The continuation rerun log is stored at:
+
+- `C:/Users/wangz/robotics_massive_pool_paper_factory/logs/101_workspace_topology_change_detection_continuation_rerun_20260615.log`
+
 ## Rebuild PDF
 
 ```powershell
 cd paper
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 ```

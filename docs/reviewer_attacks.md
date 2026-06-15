@@ -7,3 +7,5 @@
 5. The oracle gap remains large: `0.677` proposed success versus `0.829` oracle success under combined stress.
 6. Replanning cost is abstract rather than measured wall-clock robot time.
 7. The paper still needs a full manual related-work synthesis.
+
+Response after v4.1: keep the paper as STRONG_REVISE because the local topology-change mechanism reproduced, but do not submit it without external validation.
