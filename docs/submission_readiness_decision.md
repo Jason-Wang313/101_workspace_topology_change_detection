@@ -4,16 +4,19 @@ Decision: STRONG_REVISE
 
 ICLR main-conference readiness: NO.
 
-The v4.1 continuation rerun re-executed the paper-specific workspace-topology benchmark on 2026-06-15. It includes strong baselines, ablations, stress tests, seed uncertainty, failure cases, generated figures, generated tables, and reproducible code. The local evidence still supports the mechanism against `topological_slam_tamp`.
+The v5 expanded rebuild executed a frozen, paper-specific workspace-topology benchmark. It includes strong baselines, ablations, stress tests, fixed-risk tests, seed uncertainty, pairwise comparisons, failure cases, generated figures, generated tables, a 25-page manuscript, and reproducible code. The local evidence supports the mechanism against every non-oracle baseline.
 
 Reproduced local gates:
 
-- Success gate: proposed success `0.677 +/- 0.006` vs `0.564 +/- 0.005` for `topological_slam_tamp`.
-- Safety gate: proposed invalid-plan `0.310`, collision/trap `0.188`, and support failure `0.093`, all below the strongest baseline.
-- Diagnostic gate: proposed topology F1 `0.635` and detection latency `0.565` vs `0.493` and `0.685` for the strongest baseline.
-- Pairwise gate: proposed beats `topological_slam_tamp` by `0.114 +/- 0.006`, winning `7/7` seeds.
-- Ablation gate: best removed-component ablation is `minus_replan_hysteresis` at `0.622`, below full at `0.680`.
-- Stress gate: at maximum topology stress, proposed success is `0.678` vs `0.549` for `topological_slam_tamp`.
+- Success gate: proposed v5 success `0.80095 +/- 0.00707` vs `0.67222 +/- 0.00988` for the strongest non-oracle reference and `0.55191 +/- 0.01402` for topological SLAM/TAMP.
+- Safety gate: proposed invalid-plan `0.14149`, collision/trap `0.03385`, and support failure `0.01424`, all below the strongest non-oracle reference.
+- Diagnostic gate: proposed topology F1 `0.74339`, missed-change false negative rate `0.36731`, false-alarm rate `0.14104`, and detection latency `0.61527`.
+- Calibration gate: proposed ECE `0.18972`, below the strongest non-oracle reference ECE `0.32219`.
+- Pairwise gate: proposed v5 beats all non-oracle baselines and trails only the oracle.
+- Utility/regret gate: proposed utility `0.43639` and regret `0.10391`.
+- Ablation gate: full v5 success `0.79583` vs best removed-component ablation `0.73429`.
+- Fixed-risk gate: strict coverage `1.00000`, success `0.79427`, collision/trap `0.03351`, support failure `0.01215`, utility `0.43183`.
+- Scope gate: failed.
 
 The paper is not submission-ready because validation remains local. It still lacks real-robot deployment, accepted external benchmark comparison, calibrated topology-change logs, trained model checkpoints, videos, and a full manual related-work synthesis.
 

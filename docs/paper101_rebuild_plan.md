@@ -76,4 +76,12 @@ The benchmark was implemented and run. Terminal gate result: STRONG_REVISE. The 
 
 ## Continuation Result
 
-Re-executed on 2026-06-15 under the Paper 101 ICLR-main submission-readiness plan. The result remained `STRONG_REVISE`: `proposed_topology_change_detector` beat `topological_slam_tamp` on combined-stress success (0.677 vs 0.564), improved invalid-plan/collision/support safety, improved topology F1 and detection latency, won the paired seed gate, and no removed-component ablation matched the full method. It still is not ICLR-main ready without external robot or accepted benchmark validation.
+Re-executed on 2026-06-15 under the Paper 101 ICLR-main submission-readiness plan. The historical v4.1 result remained `STRONG_REVISE`: the then-current topology-change detector beat topological SLAM/TAMP on combined-stress success, improved invalid-plan/collision/support safety, improved topology F1 and detection latency, won the paired seed gate, and no removed-component ablation matched the full method. It still was not ICLR-main ready without external robot or accepted benchmark validation.
+
+## v5 Expanded Submission Result
+
+Executed on 2026-06-22 under `docs/paper101_expanded_submission_plan_20260622.md`.
+
+The benchmark was expanded to 6 tasks x 8 topology-change regimes x 8 splits x 15 methods x 10 seeds x 6 episodes per cell. The run produced 345,600 main rollouts, 115,200 ablation rollouts, 288,000 stress rollouts, 276,480 fixed-risk rollouts, and 24 negative cases.
+
+Terminal result remained `STRONG_REVISE`. The new `risk_calibrated_topology_belief_v5` reached hard-aggregate success `0.80095`, beating the strongest non-oracle v4 reference at `0.67222` and topological SLAM/TAMP at `0.55191`, while reducing invalid plans, collision/trap failures, support failures, ECE, regret, and improving utility. All local empirical gates passed. The scope gate failed because there is still no real robot, accepted high-fidelity benchmark, external benchmark, calibrated topology-change log, trained checkpoint, or rollout-video evidence.

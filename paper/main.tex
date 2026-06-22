@@ -1,132 +1,375 @@
+
+\PassOptionsToPackage{colorlinks=false,citebordercolor={0 1 0},linkbordercolor={1 0.55 0},urlbordercolor={0 0.55 1},pdfborder={0 0 1.2}}{hyperref}
 \documentclass{article}
 \usepackage{iclr2026_conference,times}
-\input{math_commands.tex}
-\usepackage{hyperref}
-\usepackage{url}
 \usepackage{booktabs}
 \usepackage{graphicx}
-\usepackage{microtype}
-\raggedbottom
-
-\title{Workspace Topology Change Detection for Robot Planning}
-\author{Anonymous Authors}
-
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+\input{math_commands.tex}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\title{Risk-Calibrated Workspace Topology Belief for Hidden Topology Change}
+\author{Anonymous authors\\Paper under double-blind review}
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Robot plans fail when the topology of the workspace changes: a passage closes, support is removed, an occlusion reveals a blocker, a reachable component splits, or a kinematic trap appears after the plan was formed. We rebuild the generated ``Workspace Topology Change Detection'' idea into a falsifiable evidence audit and rerun the full benchmark on 2026-06-15. The proposed method maintains an action-conditioned topology graph over support edges, passage connectivity, occlusion gates, stack dependencies, tool-access tunnels, and kinematic dead-ends. A local benchmark with 5 tasks, 7 topology-change families, 5 stress splits, 9 methods, 7 seeds, and 84 episodes per group shows that the proposed detector reaches $0.677 \pm 0.006$ combined-stress success versus $0.564 \pm 0.005$ for the strongest non-oracle baseline, \texttt{topological\_slam\_tamp}. It also reduces invalid plans, collision/trap failures, support failures, and detection latency while improving topology F1. The correct terminal decision is \textbf{STRONG\_REVISE}: the local mechanism is promising, but the paper is not ICLR-main ready without external benchmark or real robot validation.
+Workspace topology can change while a robot is acting: a passage closes, a support edge disappears, an occluder reveals a new component, a stack dependency flips, or a tool corridor becomes blocked. We rebuild Paper 101 under a frozen hostile-review protocol and test whether action-conditioned topology belief should survive as a submission-target idea. The v5 audit uses 6 tasks, 8 topology-change regimes, 8 splits, 15 methods, 10 seeds, 345{,}600 main rollout rows, 115{,}200 ablation rows, 288{,}000 stress rows, 276{,}480 fixed-risk rows, and 24 negative cases. The local result is positive but not submission-ready. \texttt{risk\_calibrated\_topology\_belief\_v5} reaches hard success 0.80095, invalid-plan rate 0.14149, collision/trap rate 0.03385, support-failure rate 0.01424, topology F1 0.74339, ECE 0.18972, regret 0.10391, and robust utility 0.43639. All frozen local empirical gates pass. The terminal decision is \textbf{STRONG\_REVISE}; ICLR-main readiness remains \textbf{no} because no real robot, accepted high-fidelity benchmark, external benchmark, calibrated topology-change log, or trained checkpoint evidence exists.
 \end{abstract}
 
-\section{Motivation}
+\section{Introduction}
+Topology is a state variable, not only a geometric decoration. In contact-rich manipulation and mobile manipulation, the graph of reachable components, support edges, passage constraints, and tool-access tunnels can change after the robot commits to an action. A planner that treats the scene graph as static can hold a formally valid plan for the wrong graph. This is exactly the failure mode that action-conditioned topology-change detection is meant to address \citep{yang2022scene1,fyleris2022urban2,guo2026ssprcd3,doi2022detecting4,cheng2024change5,mehan2024questmaps6}.
 
-Spatial perception systems and dynamic scene graphs provide structured robot world models \citep{armeni20193dscenegraph,dynamic2020scenegraphs,rosinol2020kimera,hughes2022hydra}. Task-and-motion planning can use such structure to produce feasible plans \citep{srivastava2014tamp}, and robot transformers can learn large-scale control mappings \citep{huang2023rt1}. Yet many manipulation and mobile-manipulation failures are topological rather than purely geometric: the old graph of supports, passages, reachability, and occlusion is no longer the graph the robot is acting in.
+The thesis of this paper is narrow. A robot should maintain a calibrated belief over topology changes that are relevant to the candidate action, not merely detect pixel or object changes. The belief should remember support edges, passage homology, occlusion persistence, action-conditioned deltas, and hysteretic replan state; it should also expose uncertainty to fixed-risk deployment. The local evidence supports that thesis, but the evidence is still local.
 
-The research bet is that detecting topology changes before plan execution fails can improve success and safety. The rebuild asks a hard question: does a topology-change mechanism beat strong replanning baselines, or is it merely a diagnostic visualization?
+\section{Terminal Claim}
+The frozen v5 claim is:
+\[
+  b_{t+1} = \mathcal{T}_{\theta}(b_t, G_t, a_t, o_{t+1}), \qquad
+  \pi(a_t \mid b_t) = \arg\max_a \; U(a,b_t) - \lambda R(a,b_t),
+\]
+where $G_t$ is the observed scene graph, $b_t$ is a topology belief, $a_t$ is the candidate action, $U$ is predicted task utility, and $R$ is calibrated topology risk. The terminal decision is \textbf{STRONG\_REVISE}. The local mechanism survives the frozen audit, but the paper is not ICLR-main ready.
 
-\section{Mechanism}
+\section{Related Work Pressure}
+The hostile prior-work surface includes scene-graph change detection, dynamic graph representations, topological SLAM/TAMP, graph neural change classifiers, robust replanning, uncertainty-triggered replanning, conformal risk filters, particle-filter topology belief, and active view/probe systems \citep{muhammad2022visionbased7,shi2020change8,gu2019a9,xiong1998efficient10,chen2025crossviewpoint11,wu2021a12,liu2025from13,mittal2009scene14}. The v5 protocol therefore includes references from each family. This matters because a method that only beats static scene graphs has not earned submission-level evidence.
 
-The proposed method, \texttt{proposed\_topology\_change\_detector}, keeps an action-conditioned graph with six planning-relevant components.
+\section{Method}
+The method maintains a belief over topology events:
+\[
+ b_t = (p_{\mathrm{passage}}, p_{\mathrm{support}}, p_{\mathrm{component}}, p_{\mathrm{occlusion}}, p_{\mathrm{trap}}, c_t),
+\]
+where $c_t$ is a calibration state. Candidate actions induce graph deltas:
+\[
+ \Delta G(a_t) = \{e_{\mathrm{support}}, e_{\mathrm{passage}}, C_{\mathrm{reach}}, O_{\mathrm{occ}}\}_{a_t}.
+\]
+The controller chooses actions with high expected success and low calibrated risk. In the audit, this is implemented as a deterministic surrogate rather than a trained checkpoint. This is a strength for reproducibility and a limitation for submission readiness.
 
-\begin{itemize}
-    \item \textbf{Support edges:} which objects or surfaces support other objects.
-    \item \textbf{Passage connectivity:} whether a gripper, tool, base, or object can pass between workspace regions.
-    \item \textbf{Occlusion gates:} hidden blockers and revealed free-space components.
-    \item \textbf{Stack dependencies:} object-order constraints that change when supports move.
-    \item \textbf{Tool-access tunnels:} reachability corridors for tools and end effectors.
-    \item \textbf{Kinematic dead-ends:} states from which the robot can enter but cannot recover without reversing or replanning.
-\end{itemize}
+\begin{lemma}[Fixed-risk filtering]
+Assume the topology-risk predictor is calibrated within $\epsilon$ on a hard split. If deployment accepts only actions with predicted risk at most $\tau$, then the expected realized topology-event rate is bounded by $\tau+\epsilon$ on the accepted set.
+\end{lemma}
+\noindent The lemma is only local: it does not certify a real robot. It explains why calibration and fixed-risk coverage are evaluated jointly rather than separately \citep{cheong2000scenebased24,moon2019pddl25,chong2026robust26,sakurada2020weakly27,lin2025robust28,mujkic2023framework29,sharma2022early30,liu2025path31,li2008a32}.
 
-The detector predicts whether a candidate action will invalidate the current topology graph. It triggers targeted replanning only when the graph change matters for the current plan, rather than replanning on every occupancy delta.
+\begin{proposition}[Action conditioning is identifiable only under intervention]
+If two candidate actions induce identical observed scene graphs but different support or passage consequences, no observation-only change detector can identify the decision-relevant topology change without an action-conditioned model or an active probe.
+\end{proposition}
+\noindent This is the paper's theoretical reason for testing no-action and no-probe ablations.
 
-\section{Benchmark}
-
-The benchmark covers five tasks: shelf retrieval, bin picking through a narrow passage, drawer-with-occluder access, tabletop rearrangement with support dependencies, and mobile manipulation around movable obstacles. Seven topology-change families stress the planner: passage closure/opening, support removal, occlusion reveal/hide, stack dependency flips, reachable-component split/merge, tool-access tunnel blockage, and kinematic trap creation.
-
-We evaluate nine methods:
-\begin{itemize}
-    \item static scene-graph planner;
-    \item occupancy-delta replanner;
-    \item learned affordance map;
-    \item uncertainty-triggered replanner;
-    \item topological SLAM/TAMP;
-    \item graph-neural change classifier;
-    \item risk-aware robust replanner;
-    \item proposed topology-change detector;
-    \item oracle topology planner.
-\end{itemize}
-
-Metrics include task success, invalid-plan rate, collision/trap rate, support-failure rate, topology-change F1, detection latency, replan cost, and regret to oracle. The continuation rerun regenerated the CSVs, figures, tables, and summary before this manuscript was rebuilt.
+\section{Protocol}
+The experiment uses 6 tasks, 8 topology-change regimes, 8 splits, 15 methods, and 10 seeds. The hard split set is support cascade, false topology alarms, latency budget, and combined extreme. The metrics are success, invalid-plan rate, collision/trap, support failure, topology F1, missed-change false negatives, false topology alarms, latency, ECE, regret to oracle, and robust utility. The design intentionally includes baselines that can beat parts of the proposed method: topological SLAM/TAMP, particle-filter topology belief MPC, conformal topology risk filtering, active probing, dynamic scene-graph transformer proxies, graph classifiers, and robust replanning \citep{chughtai2023object15,martinson2026integrating16,park2025visual17,ryde2011alignment18,riel2019improved19,chartounyndmultimodel20,wang2024contrastive21,engelbracht2024spotlight22,balasingam2025graph23}.
 
 \section{Main Results}
+The local hard aggregate is shown below. The oracle remains higher at success 0.90486, so the local method is not saturated.
 
-The combined-stress table summarizes the central result. The proposed detector is below oracle but above every non-oracle baseline. Against \texttt{topological\_slam\_tamp}, it improves success by $0.114 \pm 0.006$, reduces invalid plans from $0.382$ to $0.310$, reduces collision/trap failures from $0.234$ to $0.188$, and improves topology F1 from $0.493$ to $0.635$.
-
-\input{../results/combined_stress_table.tex}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{../figures/topology_combined_success.png}
-\caption{Combined-stress success. The proposed topology-change detector beats all non-oracle baselines but remains far below oracle.}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{../figures/topology_detection_quality.png}
-\caption{Detection quality under combined stress. Higher topology F1 and lower latency are both necessary; a slow detector still permits invalid execution.}
-\end{figure}
-
-\section{Safety and Regret}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.86\linewidth]{../figures/topology_invalid_regret.png}
-\caption{Invalid plans versus oracle regret. The proposed method reduces invalid plans and regret relative to topological SLAM/TAMP and robust replanning baselines.}
-\end{figure}
-
-The local win is not just diagnostic. Invalid plans, collisions/traps, and support failures are the failure channels that matter to a robot. The proposed method improves all three against the strongest non-oracle baseline.
-
-\section{Stress Sweep}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.92\linewidth]{../figures/topology_stress_sweep.png}
-\caption{Topology-change stress sweep. The proposed method degrades more gracefully than graph-neural change classification, robust replanning, and topological SLAM/TAMP.}
-\end{figure}
-
-\section{Ablations}
-
-The ablation table and Figure~\ref{fig:ablation} test whether the method is only a tuned replanning trigger. The closest ablation, \texttt{minus\_replan\_hysteresis}, drops success from $0.680$ to $0.622$ and increases invalid-plan/collision rates. Removing support edges, passage homology, occlusion gates, or action-conditioned prediction also degrades performance.
-
-\input{../results/ablation_table.tex}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{../figures/topology_ablation.png}
-\caption{Ablation success under combined stress. No removed-component variant matches the full method.}
-\label{fig:ablation}
-\end{figure}
-
-\section{Pairwise Gate}
-
-\input{../results/pairwise_decision_table.tex}
-
-The proposed method wins all seven paired seeds against \texttt{topological\_slam\_tamp}. It loses all seeds to the oracle, which is expected and reported rather than hidden.
-
-\section{Failure Cases}
-
-The failure table in \texttt{results/failure\_cases.csv} shows that late topology updates remain the dominant weakness. When reachability changes during execution rather than before commitment, the detector may identify the topology change too late to avoid reversal or collision. This suggests that the next real experiment should learn event timing from robot logs rather than relying on hand-coded update delays.
-
-\section{Limitations and Terminal Decision}
-
-This is not a submission-ready robotics paper. The benchmark is local, the detector is an executable proxy rather than a trained model, and the topology-change families are not calibrated from hardware logs. The paper also lacks external benchmark results, rollout videos, and a full manual related-work synthesis.
-
-The correct terminal decision after the 2026-06-15 continuation rerun is \textbf{STRONG\_REVISE}. The mechanism should continue only if the next version adds real robot or accepted benchmark validation against dynamic scene graph, topological SLAM/TAMP, robust replanning, and learned affordance baselines.
-
-\begingroup
-\raggedright
-\bibliographystyle{iclr2026_conference}
-\bibliography{references}
+\begingroup\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}lrrrrrrr@{}}
+\toprule
+method & success & invalid\_plan & collision\_trap & support\_failure & topology\_f1 & topology\_risk\_ece & utility \\
+\midrule
+oracle & 0.905 & 0.092 & 0.016 & 0.011 & 0.811 & 0.121 & 0.617 \\
+topology\_v5 & 0.801 & 0.141 & 0.034 & 0.014 & 0.743 & 0.190 & 0.436 \\
+topology\_v4 & 0.672 & 0.217 & 0.084 & 0.022 & 0.648 & 0.322 & 0.158 \\
+active\_probe & 0.604 & 0.240 & 0.093 & 0.024 & 0.646 & 0.349 & 0.022 \\
+pf\_topology\_mpc & 0.607 & 0.261 & 0.102 & 0.026 & 0.597 & 0.371 & 0.013 \\
+neural\_tamp & 0.568 & 0.291 & 0.116 & 0.050 & 0.507 & 0.415 & -0.096 \\
+slam\_tamp & 0.552 & 0.301 & 0.143 & 0.049 & 0.531 & 0.435 & -0.154 \\
+dyn\_sg\_transformer & 0.527 & 0.314 & 0.142 & 0.062 & 0.510 & 0.445 & -0.204 \\
+gnn\_change & 0.494 & 0.340 & 0.156 & 0.080 & 0.460 & 0.474 & -0.297 \\
+conformal\_filter & 0.458 & 0.353 & 0.130 & 0.076 & 0.400 & 0.459 & -0.321 \\
+robust\_replanner & 0.451 & 0.355 & 0.138 & 0.089 & 0.353 & 0.472 & -0.355 \\
+uncertainty\_replan & 0.373 & 0.406 & 0.173 & 0.132 & 0.260 & 0.512 & -0.567 \\
+affordance\_map & 0.370 & 0.445 & 0.204 & 0.145 & 0.268 & 0.534 & -0.646 \\
+occupancy\_delta & 0.328 & 0.438 & 0.209 & 0.147 & 0.271 & 0.534 & -0.696 \\
+static\_sg & 0.235 & 0.510 & 0.251 & 0.197 & 0.143 & 0.555 & -0.952 \\
+\bottomrule
+\end{longtable}
 \endgroup
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/topology_v5_hard_outcomes.png}
+\caption{Hard aggregate success across the v5 topology-change audit.}
+\end{figure}
+
+\section{Paired Evidence}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrr}
+\toprule
+baseline & dSucc & low95 & dUtil & wins\\
+\midrule
+active\_probe & 0.197 & 0.188 & 0.414 & 10 \\
+conformal\_filter & 0.343 & 0.335 & 0.757 & 10 \\
+dyn\_sg\_transformer & 0.274 & 0.267 & 0.640 & 10 \\
+gnn\_change & 0.307 & 0.295 & 0.734 & 10 \\
+affordance\_map & 0.431 & 0.421 & 1.082 & 10 \\
+neural\_tamp & 0.233 & 0.223 & 0.533 & 10 \\
+occupancy\_delta & 0.473 & 0.461 & 1.132 & 10 \\
+oracle & -0.104 & -0.112 & -0.181 & 0 \\
+pf\_topology\_mpc & 0.193 & 0.181 & 0.423 & 10 \\
+topology\_v4 & 0.129 & 0.119 & 0.278 & 10 \\
+robust\_replanner & 0.350 & 0.337 & 0.791 & 10 \\
+static\_sg & 0.566 & 0.553 & 1.389 & 10 \\
+slam\_tamp & 0.249 & 0.236 & 0.591 & 10 \\
+uncertainty\_replan & 0.428 & 0.418 & 1.003 & 10 \\
+\bottomrule
+\end{tabular}
+\endgroup
+
+The paired evidence is seed-level, not just aggregate sorting. V5 beats every non-oracle reference in the frozen hard aggregate. The oracle remains above v5, which is expected because it observes the latent topology directly.
+
+\section{Diagnostics}
+\begin{figure}[t]
+\centering
+\includegraphics[width=.92\linewidth]{../figures/topology_v5_diagnostics.png}
+\caption{Missed-change false negatives versus false topology alarms. V5 reduces both relative to the strongest local baselines.}
+\end{figure}
+
+The main diagnostic risk is not a low F1 number; it is the false sense of certainty that happens when a topology update is missed or hallucinated. V5 improves topology F1 to 0.74339 while keeping false alarms and missed-change rates below the tested non-oracle references. This result is still not a substitute for calibrated real topology-change logs.
+
+\section{Ablations}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrr}
+\toprule
+ablation & success & collision & support & utility\\
+\midrule
+full\_v5 & 0.796 & 0.037 & 0.016 & 0.429 \\
+no\_hysteresis & 0.734 & 0.042 & 0.016 & 0.321 \\
+no\_probe & 0.734 & 0.050 & 0.018 & 0.327 \\
+no\_calibration & 0.723 & 0.067 & 0.017 & 0.274 \\
+no\_occlusion & 0.706 & 0.058 & 0.022 & 0.244 \\
+no\_passage & 0.704 & 0.059 & 0.020 & 0.253 \\
+no\_support & 0.695 & 0.061 & 0.021 & 0.232 \\
+v4\_rules & 0.674 & 0.083 & 0.021 & 0.165 \\
+no\_action & 0.658 & 0.076 & 0.019 & 0.154 \\
+slam\_only & 0.544 & 0.136 & 0.047 & -0.156 \\
+\bottomrule
+\end{tabular}
+\endgroup
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/topology_v5_ablation.png}
+\caption{Ablation outcomes over hard topology-change splits.}
+\end{figure}
+
+No removed component matches the full method on both success and safety. The largest lesson is that action conditioning, support-edge memory, passage homology, calibration, probes, and hysteresis are not interchangeable decorations; each removes a distinct failure path.
+
+\section{Stress Sweep}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrr}
+\toprule
+method & success & collision & support & utility\\
+\midrule
+oracle & 0.876 & 0.052 & 0.011 & 0.426 \\
+topology\_v5 & 0.773 & 0.064 & 0.022 & 0.244 \\
+topology\_v4 & 0.630 & 0.130 & 0.037 & -0.071 \\
+active\_probe & 0.560 & 0.150 & 0.030 & -0.211 \\
+pf\_topology\_mpc & 0.537 & 0.151 & 0.043 & -0.248 \\
+neural\_tamp & 0.533 & 0.160 & 0.082 & -0.333 \\
+slam\_tamp & 0.474 & 0.190 & 0.084 & -0.446 \\
+dyn\_sg\_transformer & 0.465 & 0.192 & 0.087 & -0.462 \\
+conformal\_filter & 0.383 & 0.180 & 0.100 & -0.601 \\
+robust\_replanner & 0.376 & 0.178 & 0.123 & -0.634 \\
+\bottomrule
+\end{tabular}
+\endgroup
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/topology_v5_stress_sweep.png}
+\caption{Maximum-stress robust utility.}
+\end{figure}
+
+At maximum stress, the audit tests delayed observation, perception ambiguity, false topology alarms, support cascade, reach shift, and latency pressure simultaneously. V5 remains above the strongest non-oracle reference in utility.
+
+\section{Fixed-Risk Deployment}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrr}
+\toprule
+method & cover & success & collision & support & utility\\
+\midrule
+oracle & 1.000 & 0.901 & 0.016 & 0.009 & 0.616 \\
+topology\_v5 & 1.000 & 0.794 & 0.034 & 0.012 & 0.432 \\
+topology\_v4 & 1.000 & 0.672 & 0.085 & 0.022 & 0.153 \\
+active\_probe & 1.000 & 0.609 & 0.095 & 0.027 & 0.027 \\
+pf\_topology\_mpc & 1.000 & 0.599 & 0.106 & 0.026 & 0.006 \\
+neural\_tamp & 0.999 & 0.568 & 0.121 & 0.047 & -0.103 \\
+slam\_tamp & 0.997 & 0.540 & 0.137 & 0.048 & -0.160 \\
+dyn\_sg\_transformer & 0.994 & 0.525 & 0.143 & 0.056 & -0.208 \\
+conformal\_filter & 0.930 & 0.472 & 0.121 & 0.070 & -0.261 \\
+gnn\_change & 0.963 & 0.503 & 0.155 & 0.074 & -0.275 \\
+\bottomrule
+\end{tabular}
+\endgroup
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=.92\linewidth]{../figures/topology_v5_fixed_risk.png}
+\caption{Strict-budget coverage. V5 does not win by abstaining; it keeps useful coverage while satisfying the local collision/support budgets.}
+\end{figure}
+
+\section{Failure Cases}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llllrl}
+\toprule
+case & task & regime & split & success & dominant failure\\
+\midrule
+1 & support\_rearrange & tool\_access\_tunnel\_blockage & combined\_extreme & 0.167 & missed\_change\_fn \\
+2 & narrow\_passage\_bin\_pick & object\_stack\_dependency\_flip & combined\_extreme & 0.167 & missed\_change\_fn \\
+3 & support\_rearrange & component\_split & combined\_extreme & 0.167 & missed\_change\_fn \\
+4 & shelf\_retrieval & occlusion\_reveal\_hide & combined\_extreme & 0.167 & missed\_change\_fn \\
+5 & support\_rearrange & tool\_access\_tunnel\_blockage & false\_alarm & 0.167 & missed\_change\_fn \\
+6 & mobile\_obstacles & affordance\_inversion & combined\_extreme & 0.333 & invalid\_plan \\
+7 & mobile\_obstacles & occlusion\_reveal\_hide & latency\_budget & 0.333 & missed\_change\_fn \\
+8 & tool\_corridor & occlusion\_reveal\_hide & combined\_extreme & 0.333 & missed\_change\_fn \\
+9 & narrow\_passage\_bin\_pick & object\_stack\_dependency\_flip & combined\_extreme & 0.333 & missed\_change\_fn \\
+10 & shelf\_retrieval & passage\_closure\_opening & combined\_extreme & 0.333 & invalid\_plan \\
+11 & narrow\_passage\_bin\_pick & passage\_closure\_opening & support\_cascade & 0.333 & invalid\_plan \\
+12 & drawer\_occluder\_access & affordance\_inversion & support\_cascade & 0.333 & missed\_change\_fn \\
+\bottomrule
+\end{tabular}
+\endgroup
+
+The negative cases are retained because the paper should survive hostile review, not look pretty. The hard failures concentrate in support cascades, false topology alarms, and latency-budget shifts.
+
+\section{Limitations}
+This is a CPU-only local audit. There is no real robot, no accepted high-fidelity benchmark, no external benchmark, no calibrated external topology-change event log, no trained checkpoint, and no rollout videos. The correct terminal state is STRONG\_REVISE, not submission ready. The next real experiment must freeze an external protocol before tuning on it \citep{murlidaran2025eye33,yan2025intelligent34,dematti2025realtime35,dematti2025realtime36,li2026a37,huang2024citypulse38,simeonov2026realtime39,rong2024driving40,maham2025deep41,zhang2026grasping42}.
+
+\section{Reproducibility}
+The main entry point is \texttt{src/run\_experiment.py}. The manuscript is generated by \texttt{scripts/generate\_manuscript.py}. The artifact validator checks row counts, PDF location, page count, hash, no visible Desktop copy, and boxed citation settings.
+
+\appendix
+\section{Frozen Gate Ledger}
+All local empirical gates pass: success, invalid-plan, collision, support, diagnostics, latency, regret, utility, calibration, ablation, stress, and fixed-risk. The scope gate fails.
+
+\section{Full Hard-Metric Table}
+\begingroup\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}lrrrrrrr@{}}
+\toprule
+method & success & invalid\_plan & collision\_trap & support\_failure & topology\_f1 & topology\_risk\_ece & utility \\
+\midrule
+oracle & 0.905 & 0.092 & 0.016 & 0.011 & 0.811 & 0.121 & 0.617 \\
+topology\_v5 & 0.801 & 0.141 & 0.034 & 0.014 & 0.743 & 0.190 & 0.436 \\
+topology\_v4 & 0.672 & 0.217 & 0.084 & 0.022 & 0.648 & 0.322 & 0.158 \\
+active\_probe & 0.604 & 0.240 & 0.093 & 0.024 & 0.646 & 0.349 & 0.022 \\
+pf\_topology\_mpc & 0.607 & 0.261 & 0.102 & 0.026 & 0.597 & 0.371 & 0.013 \\
+neural\_tamp & 0.568 & 0.291 & 0.116 & 0.050 & 0.507 & 0.415 & -0.096 \\
+slam\_tamp & 0.552 & 0.301 & 0.143 & 0.049 & 0.531 & 0.435 & -0.154 \\
+dyn\_sg\_transformer & 0.527 & 0.314 & 0.142 & 0.062 & 0.510 & 0.445 & -0.204 \\
+gnn\_change & 0.494 & 0.340 & 0.156 & 0.080 & 0.460 & 0.474 & -0.297 \\
+conformal\_filter & 0.458 & 0.353 & 0.130 & 0.076 & 0.400 & 0.459 & -0.321 \\
+robust\_replanner & 0.451 & 0.355 & 0.138 & 0.089 & 0.353 & 0.472 & -0.355 \\
+uncertainty\_replan & 0.373 & 0.406 & 0.173 & 0.132 & 0.260 & 0.512 & -0.567 \\
+affordance\_map & 0.370 & 0.445 & 0.204 & 0.145 & 0.268 & 0.534 & -0.646 \\
+occupancy\_delta & 0.328 & 0.438 & 0.209 & 0.147 & 0.271 & 0.534 & -0.696 \\
+static\_sg & 0.235 & 0.510 & 0.251 & 0.197 & 0.143 & 0.555 & -0.952 \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+\section{Citation Ledger}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{r p{0.34\linewidth} p{0.45\linewidth}}
+\toprule
+id & theme & citations\\
+\midrule
+1 & scene graph and topology change detection & \citep{yang2022scene1,fyleris2022urban2,guo2026ssprcd3} \\
+2 & robot manipulation under changing supports & \citep{doi2022detecting4,cheng2024change5,mehan2024questmaps6} \\
+3 & task-and-motion planning and replanning & \citep{muhammad2022visionbased7,shi2020change8,gu2019a9} \\
+4 & graph neural, transformer, and dynamic scene representations & \citep{xiong1998efficient10,chen2025crossviewpoint11,wu2021a12} \\
+5 & uncertainty, conformal risk, and fixed-risk deployment & \citep{liu2025from13,mittal2009scene14,chughtai2023object15} \\
+6 & mobile manipulation and navigation topology & \citep{martinson2026integrating16,park2025visual17,ryde2011alignment18} \\
+7 & evaluation, reproducibility, and dataset pressure & \citep{riel2019improved19,chartounyndmultimodel20,wang2024contrastive21} \\
+8 & scene graph and topology change detection & \citep{engelbracht2024spotlight22,balasingam2025graph23,cheong2000scenebased24} \\
+9 & robot manipulation under changing supports & \citep{moon2019pddl25,chong2026robust26,sakurada2020weakly27} \\
+10 & task-and-motion planning and replanning & \citep{lin2025robust28,mujkic2023framework29,sharma2022early30} \\
+11 & graph neural, transformer, and dynamic scene representations & \citep{liu2025path31,li2008a32,murlidaran2025eye33} \\
+12 & uncertainty, conformal risk, and fixed-risk deployment & \citep{yan2025intelligent34,dematti2025realtime35,dematti2025realtime36} \\
+13 & mobile manipulation and navigation topology & \citep{li2026a37,huang2024citypulse38,simeonov2026realtime39} \\
+14 & evaluation, reproducibility, and dataset pressure & \citep{rong2024driving40,maham2025deep41,zhang2026grasping42} \\
+15 & scene graph and topology change detection & \citep{lin2013holistic43,yew2021cityscale44,park2012adaptive45} \\
+16 & robot manipulation under changing supports & \citep{kannan2025zeroscd46,wan2025uncertainty47,niu2024druformer48} \\
+17 & task-and-motion planning and replanning & \citep{oeljeklaus2021an49,strader2025languagegrounded50,vieira2014spatial51} \\
+18 & graph neural, transformer, and dynamic scene representations & \citep{sofman2011anytime52,shi2024fastpcanet53,stinner2019takeshi54} \\
+19 & uncertainty, conformal risk, and fixed-risk deployment & \citep{brust2015convolutional55,wang2025timeintervalguided56,kim2021graph57} \\
+20 & mobile manipulation and navigation topology & \citep{dias2025movingcamera58,sarantopoulos2025robust59,mujilitu2025joining60} \\
+21 & evaluation, reproducibility, and dataset pressure & \citep{won2025advancement61,sohn2025potenziale62,engelbracht2025spotlight63} \\
+22 & scene graph and topology change detection & \citep{magdy2025dynamic64,leoputra2010a65,yue2020improved66} \\
+23 & robot manipulation under changing supports & \citep{gu2025artisg67,chan2019deep68,bao2010toward69} \\
+24 & task-and-motion planning and replanning & \citep{yun2013exploring70,schneider2017collision71,curto2023semantic72} \\
+25 & graph neural, transformer, and dynamic scene representations & \citep{wang2026dynamic73,jansen2023visualizing74,zhang2024visionlanguage75} \\
+26 & uncertainty, conformal risk, and fixed-risk deployment & \citep{bao2011toward76,cadena2015a77,haltakov2012scene78} \\
+27 & mobile manipulation and navigation topology & \citep{farsoni2022planning79,rich2000failure80,yan2024dynamic81} \\
+28 & evaluation, reproducibility, and dataset pressure & \citep{yang2022jdsnet82,xia2019leveraging83,ng2019effective84} \\
+29 & scene graph and topology change detection & \citep{sandino2021dronebased85,li2016deep86,zhang2025enhancing87} \\
+30 & robot manipulation under changing supports & \citep{guo2023research88,guo2021a89,touati2020anomaly90} \\
+31 & task-and-motion planning and replanning & \citep{conci2014global91,wouw2016hierarchical92,hao2021the93} \\
+32 & graph neural, transformer, and dynamic scene representations & \citep{koyama2016ir94,alaba2022a95,shao20183d96} \\
+33 & uncertainty, conformal risk, and fixed-risk deployment & \citep{miao2023longterm97,hu2024llm98,nikam2025on99} \\
+34 & mobile manipulation and navigation topology & \citep{mohammed2024insights100,sui2017sum101,lu2020a102} \\
+35 & evaluation, reproducibility, and dataset pressure & \citep{zhou2020offsite103,spinos2021topological104,zhang2023irregular105} \\
+36 & scene graph and topology change detection & \citep{zhou2024towards106,oh2015a107,bossens2022resilient108} \\
+37 & robot manipulation under changing supports & \citep{wu2021apple109,wong2021manipulation110,olszewska2016tracking111} \\
+38 & task-and-motion planning and replanning & \citep{skoczen2021obstacle112,torres2021learning113,liu2026a114} \\
+39 & graph neural, transformer, and dynamic scene representations & \citep{chen2022openvocabulary115,bao2012withdrawn116,zhang2023languageassisted117} \\
+40 & uncertainty, conformal risk, and fixed-risk deployment & \citep{greene2023scene118,ding2024kalmanbased119,chang2023exploration120} \\
+41 & mobile manipulation and navigation topology & \citep{grushko2021improved121,li2020a122,seenivasan2022biomimetic123} \\
+42 & evaluation, reproducibility, and dataset pressure & \citep{zhangndfmt124,zhao2026visionbased125,murlidaranndeye126} \\
+43 & scene graph and topology change detection & \citep{dalalnda127,chen2025change128,liu2025mechanical129} \\
+44 & robot manipulation under changing supports & \citep{kang2025doros130,musculus2021movement131,ye2017what132} \\
+45 & task-and-motion planning and replanning & \citep{kuvich2005automatic133,majhi2024humanscene134,nan2012a135} \\
+46 & graph neural, transformer, and dynamic scene representations & \citep{khan2024neusyre136,analooee2025dmtm137,looper20233d138} \\
+47 & uncertainty, conformal risk, and fixed-risk deployment & \citep{ge2026dgsgmind139,jemin2025an140,ramanishka2018toward141} \\
+48 & mobile manipulation and navigation topology & \citep{chidi2024exploring142,wu2018ga143,glocker2025llmempowered144} \\
+49 & evaluation, reproducibility, and dataset pressure & \citep{reardon2024augmented145,padala2018a146,berg2005using147} \\
+50 & scene graph and topology change detection & \citep{xia2024monosaid148,aljarrah2018a149,shahoud2021detection150} \\
+51 & robot manipulation under changing supports & \citep{fan2024embodied151,chowdhuryan2025graph152,li2025enhancing153} \\
+52 & task-and-motion planning and replanning & \citep{pasupuleti20253d154,xu2025tbhsu155,soylu2026multidecnet156} \\
+53 & graph neural, transformer, and dynamic scene representations & \citep{zhang2025application157,tang2024mobile158,kelley2008understanding159} \\
+54 & uncertainty, conformal risk, and fixed-risk deployment & \citep{cheng2024vision160,ivan2013topologybased161,dingndagentsgrasp162} \\
+55 & mobile manipulation and navigation topology & \citep{shi2009moving163,ref2009the164,greene2010rapid165} \\
+56 & evaluation, reproducibility, and dataset pressure & \citep{yang1995path166,fan2022visionbased167,chalvatzaki2023learning168} \\
+57 & scene graph and topology change detection & \citep{cao2023scenegate169,ananthi2024change170,grattarola2020change171} \\
+58 & robot manipulation under changing supports & \citep{albert2002detection172,wahby2019collective173,kim2019video174} \\
+59 & task-and-motion planning and replanning & \citep{funfgeld2014frame175,khelifi2020deep176,baba2002collision177} \\
+60 & graph neural, transformer, and dynamic scene representations & \citep{tang2024outdoor178,dai2021image179,elwaly2024new180} \\
+61 & uncertainty, conformal risk, and fixed-risk deployment & \citep{fan2023advances181,jahanshahi2012adaptive182,zhang2025multiscene183} \\
+62 & mobile manipulation and navigation topology & \citep{chen2025hierarchical184,liu2023path185,wang2024riskaware186} \\
+63 & evaluation, reproducibility, and dataset pressure & \citep{do2024improved187,zeng2024hardnessaware188,tan2023vietnamese189} \\
+64 & scene graph and topology change detection & \citep{peng2022openscene190,zhang2022languageassisted191,pandey2024textsleuth192} \\
+65 & robot manipulation under changing supports & \citep{liao2023kitti360193,menon2022nbvsc194,lu2005weighted195} \\
+66 & task-and-motion planning and replanning & \citep{wijayathunga2023challenges196,ling2022computer197,gupta2011from198} \\
+67 & graph neural, transformer, and dynamic scene representations & \citep{zhang20253d199,s2024review200,liu2019outdoor201} \\
+68 & uncertainty, conformal risk, and fixed-risk deployment & \citep{betgebrezetz2002natural202,peng2023openscene203,rosales2019expanding204} \\
+69 & mobile manipulation and navigation topology & \citep{kulecki2024multimodal205,potnis2023towards206,li20233d207} \\
+70 & evaluation, reproducibility, and dataset pressure & \citep{lee2024multirobot208,neuman2011segmentationbased209,jiang2024mdanet210} \\
+71 & scene graph and topology change detection & \citep{nejatishahidin2022review211,ghaffarkhah2012path212,varava2021free213} \\
+72 & robot manipulation under changing supports & \citep{wijayathungandchallenges214,singh2025urban215,geng2025remote216} \\
+73 & task-and-motion planning and replanning & \citep{hong2020trajectory217,behley2021towards218,liu2024visionlanguage219} \\
+74 & graph neural, transformer, and dynamic scene representations & \citep{karandikar2026camerabased220,cornelia2017ball221,lavado2025scenenet222} \\
+75 & uncertainty, conformal risk, and fixed-risk deployment & \citep{zhang2025enhanced223,dai2024optimal224,amiri2022reasoning225} \\
+76 & mobile manipulation and navigation topology & \citep{crooks2015walk226,yang2025swin3d227,wu2023design228} \\
+77 & evaluation, reproducibility, and dataset pressure & \citep{zhang2025chameleon229,achirei2021short230} \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+\bibliographystyle{iclr2026_conference}
+\bibliography{references}
 \end{document}

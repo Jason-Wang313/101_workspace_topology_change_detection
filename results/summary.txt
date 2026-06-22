@@ -1,49 +1,100 @@
-Paper 101 workspace_topology_change_detection evidence rebuild
-Design: 5 tasks x 7 topology-change families x 5 splits x 9 methods, 7 seeds, 84 episodes/group.
+Paper 101: workspace_topology_change_detection expanded v5 evidence audit
 Terminal decision: STRONG_REVISE
-Rationale: local topology-change evidence supports the mechanism, but no real robot or external benchmark validation is available
+ICLR main ready: no
+Design: 6 tasks x 8 topology-change regimes x 8 splits x 15 methods, 10 seeds, 6 episodes per seed/task/regime/split/method cell.
+Claim under test: risk-calibrated action-conditioned topology belief should improve hard topology-change manipulation beyond topological SLAM/TAMP, robust replanning, particle-filter belief, conformal filtering, graph classifiers, and scene-graph proxies.
 
-Combined-stress ranking:
-oracle_topology_planner: success=0.829 +/- 0.006, invalid=0.241, collision=0.136, support=0.052, topo_f1=0.780, latency=0.449, regret=0.000
-proposed_topology_change_detector: success=0.677 +/- 0.006, invalid=0.310, collision=0.188, support=0.093, topo_f1=0.635, latency=0.565, regret=0.152
-topological_slam_tamp: success=0.564 +/- 0.005, invalid=0.382, collision=0.234, support=0.130, topo_f1=0.493, latency=0.685, regret=0.266
-graph_neural_change_classifier: success=0.533 +/- 0.007, invalid=0.398, collision=0.247, support=0.152, topo_f1=0.459, latency=0.721, regret=0.296
-risk_aware_robust_replanner: success=0.473 +/- 0.006, invalid=0.420, collision=0.225, support=0.153, topo_f1=0.347, latency=0.763, regret=0.356
-learned_affordance_map: success=0.443 +/- 0.008, invalid=0.468, collision=0.292, support=0.197, topo_f1=0.308, latency=0.837, regret=0.386
-uncertainty_triggered_replanner: success=0.432 +/- 0.008, invalid=0.445, collision=0.252, support=0.178, topo_f1=0.297, latency=0.814, regret=0.397
-occupancy_delta_replanner: success=0.412 +/- 0.006, invalid=0.452, collision=0.284, support=0.191, topo_f1=0.327, latency=0.811, regret=0.417
-static_scene_graph_planner: success=0.354 +/- 0.005, invalid=0.506, collision=0.324, support=0.220, topo_f1=0.211, latency=0.903, regret=0.475
+Row counts:
+- ablation_metric_rows: 10
+- ablation_rollout_rows: 115200
+- ablation_seed_rows: 100
+- dataset_summary_rows: 3840
+- fixed_risk_metric_rows: 24
+- fixed_risk_pairwise_rows: 22
+- fixed_risk_rows: 276480
+- fixed_risk_seed_rows: 240
+- hard_metric_rows: 15
+- hard_pairwise_rows: 14
+- hard_seed_rows: 150
+- main_group_rows: 57600
+- main_metric_rows: 120
+- main_rollout_rows: 345600
+- main_seed_metric_rows: 150
+- stress_metric_rows: 100
+- stress_rollout_rows: 288000
+- stress_seed_rows: 1000
+
+Hard-aggregate evidence:
+- oracle_topology_planner: success=0.90486 +/- 0.00460, invalid=0.09236, collision=0.01615, support=0.01111, topo_f1=0.81136, missed_fn=0.27821, false_alarm=0.11947, latency=0.55887, ece=0.12135, regret=0.00000, utility=0.61716
+- risk_calibrated_topology_belief_v5: success=0.80095 +/- 0.00707, invalid=0.14149, collision=0.03385, support=0.01424, topo_f1=0.74339, missed_fn=0.36731, false_alarm=0.14104, latency=0.61527, ece=0.18972, regret=0.10391, utility=0.43639
+- proposed_topology_change_detector_v4: success=0.67222 +/- 0.00988, invalid=0.21727, collision=0.08359, support=0.02153, topo_f1=0.64753, missed_fn=0.46149, false_alarm=0.25948, latency=0.68867, ece=0.32219, regret=0.23264, utility=0.15822
+- active_view_topology_probe: success=0.60434 +/- 0.00721, invalid=0.23958, collision=0.09349, support=0.02439, topo_f1=0.64560, missed_fn=0.46335, false_alarm=0.25335, latency=0.64567, ece=0.34949, regret=0.30052, utility=0.02211
+- particle_filter_topology_belief_mpc: success=0.60747 +/- 0.00726, invalid=0.26085, collision=0.10165, support=0.02587, topo_f1=0.59737, missed_fn=0.51687, false_alarm=0.27358, latency=0.73427, ece=0.37082, regret=0.29740, utility=0.01325
+- neural_tamp_replanner: success=0.56806 +/- 0.00783, invalid=0.29123, collision=0.11641, support=0.05009, topo_f1=0.50719, missed_fn=0.61119, false_alarm=0.28857, latency=0.73287, ece=0.41496, regret=0.33681, utility=-0.09615
+- topological_slam_tamp: success=0.55191 +/- 0.01402, invalid=0.30095, collision=0.14280, support=0.04922, topo_f1=0.53063, missed_fn=0.58507, false_alarm=0.31019, latency=0.76407, ece=0.43542, regret=0.35295, utility=-0.15426
+- dynamic_scene_graph_transformer_proxy: success=0.52674 +/- 0.00625, invalid=0.31432, collision=0.14210, support=0.06181, topo_f1=0.50982, missed_fn=0.60490, false_alarm=0.32722, latency=0.76347, ece=0.44454, regret=0.37812, utility=-0.20376
+- graph_neural_change_classifier: success=0.49366 +/- 0.01022, invalid=0.34019, collision=0.15616, support=0.07951, topo_f1=0.45993, missed_fn=0.65415, false_alarm=0.32358, latency=0.78427, ece=0.47400, regret=0.41120, utility=-0.29734
+- conformal_topology_risk_filter: success=0.45816 +/- 0.00914, invalid=0.35321, collision=0.12969, support=0.07648, topo_f1=0.39992, missed_fn=0.72343, false_alarm=0.21863, latency=0.77727, ece=0.45920, regret=0.44670, utility=-0.32106
+- risk_aware_robust_replanner: success=0.45061 +/- 0.01143, invalid=0.35512, collision=0.13785, support=0.08950, topo_f1=0.35260, missed_fn=0.75693, false_alarm=0.28052, latency=0.74387, ece=0.47158, regret=0.45425, utility=-0.35499
+- uncertainty_triggered_replanner: success=0.37292 +/- 0.00677, invalid=0.40573, collision=0.17257, support=0.13194, topo_f1=0.25996, missed_fn=0.82655, false_alarm=0.32916, latency=0.75847, ece=0.51152, regret=0.53194, utility=-0.56669
+- learned_affordance_map: success=0.36953 +/- 0.00615, invalid=0.44488, collision=0.20434, support=0.14462, topo_f1=0.26844, missed_fn=0.81684, false_alarm=0.37375, latency=0.84567, ece=0.53393, regret=0.53533, utility=-0.64552
+- occupancy_delta_replanner: success=0.32760 +/- 0.00949, invalid=0.43828, collision=0.20894, support=0.14679, topo_f1=0.27070, missed_fn=0.81509, false_alarm=0.37124, latency=0.81967, ece=0.53447, regret=0.57726, utility=-0.69578
+- static_scene_graph_planner: success=0.23533 +/- 0.00750, invalid=0.50981, collision=0.25095, support=0.19705, topo_f1=0.14323, missed_fn=0.90718, false_alarm=0.41347, latency=0.89827, ece=0.55485, regret=0.66953, utility=-0.95213
+
+Reference winners:
+- best_success_reference=proposed_topology_change_detector_v4
+- best_invalid_reference=proposed_topology_change_detector_v4
+- best_collision_reference=proposed_topology_change_detector_v4
+- best_support_reference=proposed_topology_change_detector_v4
+- best_diagnostic_reference=proposed_topology_change_detector_v4
+- best_latency_reference=active_view_topology_probe
+- best_regret_reference=proposed_topology_change_detector_v4
+- best_utility_reference=proposed_topology_change_detector_v4
+- best_ece_reference=proposed_topology_change_detector_v4
+- max_stress_reference=proposed_topology_change_detector_v4
+- fixed_risk_reference=proposed_topology_change_detector_v4
+- v5_success=0.80095
+- v5_invalid=0.14149
+- v5_collision=0.03385
+- v5_support=0.01424
+- v5_topology_f1=0.74339
+- v5_ece=0.18972
+- v5_regret=0.10391
+- v5_utility=0.43639
+- oracle_success=0.90486
 
 Gate outcomes:
-success_gate: True
-safety_gate: True
-diagnostic_gate: True
-pairwise_gate: True
-ablation_gate: True
-success_margin_vs_strongest: 0.1137512147716232
-invalid_plan_delta_vs_strongest: -0.07172011661807581
-collision_trap_delta_vs_strongest: -0.04557823129251706
-topology_f1_delta_vs_strongest: 0.14207968901846463
-latency_delta_vs_strongest: -0.12029289634350715
-ablation_margin_vs_best_removed_component: 0.057628765792031134
-strongest_non_oracle_baseline: topological_slam_tamp
-best_removed_component: minus_replan_hysteresis
+- success_gate: True
+- invalid_plan_gate: True
+- collision_gate: True
+- support_gate: True
+- diagnostic_gate: True
+- latency_gate: True
+- regret_gate: True
+- utility_gate: True
+- calibration_gate: True
+- ablation_gate: True
+- stress_gate: True
+- fixed_risk_gate: True
+- scope_gate: False
 
-Pairwise proposed comparisons:
-graph_neural_change_classifier: diff=0.145 +/- 0.009, wins=7/7, decision=proposed_better
-learned_affordance_map: diff=0.234 +/- 0.013, wins=7/7, decision=proposed_better
-occupancy_delta_replanner: diff=0.266 +/- 0.011, wins=7/7, decision=proposed_better
-oracle_topology_planner: diff=-0.152 +/- 0.009, wins=0/7, decision=not_decisive
-risk_aware_robust_replanner: diff=0.204 +/- 0.009, wins=7/7, decision=proposed_better
-static_scene_graph_planner: diff=0.323 +/- 0.006, wins=7/7, decision=proposed_better
-topological_slam_tamp: diff=0.114 +/- 0.006, wins=7/7, decision=proposed_better
-uncertainty_triggered_replanner: diff=0.245 +/- 0.010, wins=7/7, decision=proposed_better
+Terminal rationale:
+- all frozen local empirical gates pass; terminal state remains STRONG_REVISE only because scope/external-validation evidence is missing
+- scope gate fails because no real robot, accepted high-fidelity benchmark, external benchmark, calibrated external topology-change log, or trained checkpoint evidence exists
 
-Ablations:
-full_topology_change_detector: success=0.680 +/- 0.006, invalid=0.312, collision=0.185, note=all components
-minus_replan_hysteresis: success=0.622 +/- 0.007, invalid=0.322, collision=0.190, note=over-triggers replanning
-minus_occlusion_gates: success=0.614 +/- 0.008, invalid=0.353, collision=0.211, note=removes occlusion gate state
-minus_support_edges: success=0.607 +/- 0.009, invalid=0.352, collision=0.215, note=removes support-edge tracking
-minus_passage_homology: success=0.591 +/- 0.009, invalid=0.358, collision=0.217, note=removes passage connectivity features
-minus_action_conditioned_prediction: success=0.572 +/- 0.006, invalid=0.371, collision=0.224, note=predicts topology without candidate action context
-occupancy_delta_only: success=0.430 +/- 0.006, invalid=0.445, collision=0.279, note=uses geometry deltas without topology semantics
+Ablation summary:
+- full_risk_calibrated_topology_belief_v5: success=0.79583, collision=0.03681, support=0.01563, utility=0.42853, missed_fn=0.36180
+- no_replan_hysteresis: success=0.73429, collision=0.04167, support=0.01589, utility=0.32077, missed_fn=0.40216
+- no_active_topology_probe: success=0.73368, collision=0.04974, support=0.01780, utility=0.32679, missed_fn=0.43256
+- no_topology_risk_calibration: success=0.72274, collision=0.06675, support=0.01745, utility=0.27439, missed_fn=0.38599
+- no_occlusion_persistence: success=0.70616, collision=0.05799, support=0.02188, utility=0.24403, missed_fn=0.44453
+- no_passage_homology: success=0.70365, collision=0.05868, support=0.01979, utility=0.25307, missed_fn=0.46881
+- no_support_edge_memory: success=0.69549, collision=0.06085, support=0.02135, utility=0.23248, missed_fn=0.48360
+- v4_topology_detector_rules: success=0.67422, collision=0.08273, support=0.02118, utility=0.16476, missed_fn=0.45986
+- no_action_conditioning: success=0.65842, collision=0.07630, support=0.01892, utility=0.15355, missed_fn=0.44758
+- topological_slam_only: success=0.54384, collision=0.13620, support=0.04679, utility=-0.15635, missed_fn=0.58624
+
+Fixed-risk strict v5: coverage=1.00000, success=0.79427, collision=0.03351, support=0.01215, utility=0.43183
+
+No hardware validation is claimed; this is a local CPU-only executable surrogate audit.
+terminal=STRONG_REVISE
