@@ -10,37 +10,37 @@ Action: mark STRONG_REVISE, not ready.
 
 ## Attack 2: No external benchmark
 
-Verdict: still valid. Local evidence is not enough.
+Verdict: still valid. The v5 local benchmark is large and targeted, but local evidence is not enough.
 
 Action: require external manipulation/navigation validation before submission.
 
 ## Attack 3: Baselines are weak
 
-Verdict: partly addressed. v4.1 retains topological SLAM/TAMP, graph-neural change classifier, robust replanning, uncertainty-triggered replanning, learned affordance maps, occupancy deltas, static scene graphs, and oracle.
+Verdict: materially improved. v5 includes 15 methods, including topological SLAM/TAMP, graph-neural change classification, robust replanning, uncertainty-triggered replanning, conformal risk filtering, particle-filter belief MPC, dynamic scene-graph transformer proxy, neural TAMP, active view probing, v4 detector, and oracle.
 
-Action: keep as STRONG_REVISE because the baselines are stronger but still proxy systems.
+Action: keep as STRONG_REVISE because the baselines are stronger, but most remain executable proxies rather than deployed systems.
 
 ## Attack 4: The method only improves diagnostics
 
-Verdict: addressed locally. It improves closed-loop success, invalid-plan rate, collision/trap rate, and support-failure rate.
+Verdict: addressed locally. v5 improves closed-loop success, invalid-plan rate, collision/trap rate, support-failure rate, regret, fixed-risk behavior, and utility.
 
-Action: include closed-loop metrics in manuscript.
+Action: keep closed-loop metrics central in the manuscript.
 
-## Attack 5: Replanning cost might be hidden
+## Attack 5: Replanning cost or abstention might be hidden
 
-Verdict: partially addressed. Replan cost is measured in the local benchmark, but not wall-clock robot time.
+Verdict: addressed locally but not on hardware. Replanning and risk behavior are included, and fixed-risk strict coverage is `1.00000`, so the win is not caused by abstention.
 
-Action: report cost and list real-time validation as missing.
+Action: report fixed-risk and still list real-time robot validation as missing.
 
 ## Attack 6: Ablations may not isolate topology
 
-Verdict: addressed locally. Removing support edges, passage homology, occlusion gates, action-conditioned prediction, or replan hysteresis reduces success.
+Verdict: addressed locally. Removing replan hysteresis, active probing, risk calibration, occlusion persistence, passage homology, support-edge memory, action conditioning, or replacing v5 with v4 reduces success or utility.
 
-Action: preserve ablation table.
+Action: preserve ablation table and avoid overstating causality beyond the local benchmark.
 
 ## Attack 7: Related work is incomplete
 
-Verdict: valid.
+Verdict: still valid.
 
 Action: require manual survey before submission.
 

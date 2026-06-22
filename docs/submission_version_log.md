@@ -14,12 +14,19 @@ ICLR-main gate archive. Decision: KILL_ARCHIVE because evidence was synthetic/te
 
 ## v4
 
-Paper-specific topology-change evidence rebuild. Added deterministic NumPy benchmark, strong baselines, ablations, stress sweep, pairwise seed tests, generated figures, LaTeX tables, failure cases, rewritten docs, and a new manuscript. Decision changed to STRONG_REVISE because the local mechanism is supported, while submission readiness remains blocked by missing external robotics validation.
+Paper-specific topology-change evidence rebuild. Added deterministic NumPy benchmark, strong baselines, ablations, stress sweep, pairwise seed tests, generated figures, LaTeX tables, failure cases, rewritten docs, and a new manuscript. Decision changed to STRONG_REVISE because the local mechanism was supported, while submission readiness remained blocked by missing external robotics validation.
 
 ## v4.1
 
-- Added a pre-execution ICLR-main submission-readiness plan for Paper 101.
-- Reran `python src/run_experiment.py` on 2026-06-15 with thread caps and saved the continuation log.
-- Reconfirmed CSV coverage: 45 metric rows, 1,575 per-task/family rows, 11,025 seed/task/family rows, 315 seed/split rows, 8 pairwise rows, 7 ablation rows, 49 ablation seed rows, 1,715 ablation task/family/seed rows, 54 stress-sweep rows, 378 stress-sweep seed rows, and 8 failure cases.
-- Evidence outcome unchanged: proposed method beats `topological_slam_tamp` on combined-stress success (0.677 vs 0.564), improves invalid-plan/collision/support safety, improves topology F1 and latency, wins the paired seed gate, and survives core ablations.
-- Terminal decision: STRONG_REVISE, still not ICLR-main ready without external robot or benchmark validation.
+Added a pre-execution ICLR-main submission-readiness plan for Paper 101, reran the local benchmark on 2026-06-15, and reconfirmed STRONG_REVISE.
+
+## v5 expanded
+
+- Added a frozen hostile-review plan for a 25-page submission artifact.
+- Expanded the benchmark to 6 tasks x 8 topology-change regimes x 8 splits x 15 methods x 10 seeds x 6 episodes per cell.
+- Produced 345,600 main rollouts, 115,200 ablation rollouts, 288,000 stress rollouts, 276,480 fixed-risk rollouts, and 24 negative cases.
+- Added v5 method `risk_calibrated_topology_belief_v5` with calibration, active topology probing, fixed-risk reporting, support-edge memory, passage homology, occlusion persistence, action conditioning, and replan hysteresis.
+- Added strong baselines including conformal topology risk filtering, particle-filter topology belief MPC, dynamic scene-graph transformer proxy, neural TAMP replanning, active view topology probing, v4 detector, and oracle.
+- Generated a 25-page PDF at `C:/Users/wangz/Downloads/101.pdf` with SHA256 `23709308E051A0E8AE6707EB14136BFB03AE954816511854137ABDBBF7ECBB92`.
+- Added bright boxed citation hyperlinks and 230 bibliography entries selected from the local deep-read pool.
+- Terminal decision: STRONG_REVISE, still not ICLR-main ready without external robot or accepted benchmark validation.

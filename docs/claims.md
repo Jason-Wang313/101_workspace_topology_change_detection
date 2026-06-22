@@ -2,18 +2,23 @@
 
 ## Supported Local Claim
 
-Action-conditioned topology-change detection improves planning under changing supports, passages, occlusions, reachability components, tool-access tunnels, and kinematic traps. The 2026-06-15 continuation rerun reproduced this local claim.
+Risk-calibrated action-conditioned topology belief improves closed-loop planning in a local CPU-only benchmark of changing workspace topology. The claim covers changing supports, passages, occlusions, stack dependencies, reachability splits/merges, tool tunnels, kinematic traps, and dynamic affordance inversions.
 
 ## Evidence
 
-- Proposed combined-stress success: `0.677 +/- 0.006`.
-- Strongest non-oracle baseline, `topological_slam_tamp`: `0.564 +/- 0.005`.
-- Proposed invalid-plan, collision/trap, and support-failure rates are lower than the strongest baseline.
-- Proposed topology F1 is higher and detection latency is lower than the strongest baseline.
-- Pairwise proposed-vs-strongest success difference: `0.114 +/- 0.006`, winning `7/7` seeds.
-- Ablations removing support edges, passage homology, occlusion gates, action-conditioned prediction, or replan hysteresis reduce success or worsen risk.
-- Maximum topology stress remains positive for the proposed method: `0.678` success vs `0.549` for `topological_slam_tamp`.
+- Benchmark: 6 tasks x 8 topology-change regimes x 8 splits x 15 methods x 10 seeds x 6 episodes per cell.
+- Main rollouts: 345,600.
+- Proposed v5 hard-aggregate success: `0.80095 +/- 0.00707`.
+- Strongest non-oracle reference, `proposed_topology_change_detector_v4`: `0.67222 +/- 0.00988`.
+- Topological SLAM/TAMP baseline: `0.55191 +/- 0.01402`.
+- Oracle reference: `0.90486 +/- 0.00460`.
+- Safety: v5 invalid-plan `0.14149`, collision/trap `0.03385`, support failure `0.01424`, all below the strongest non-oracle reference.
+- Diagnostics: v5 topology F1 `0.74339`, missed-change false negative rate `0.36731`, false-alarm rate `0.14104`, latency `0.61527`, ECE `0.18972`.
+- Utility/regret: v5 utility `0.43639`, regret `0.10391`.
+- Pairwise margins: v5 beats every non-oracle baseline and trails the oracle by `0.10391`.
+- Ablation: full v5 success `0.79583`; best removed-component ablation success `0.73429`.
+- Fixed-risk strict v5: coverage `1.00000`, success `0.79427`, collision/trap `0.03351`, support failure `0.01215`, utility `0.43183`.
 
 ## Scope
 
-The claim is local. It does not prove real robot performance, external benchmark superiority, or general scene-graph planning dominance.
+The claim is local. It does not prove real robot performance, accepted external benchmark superiority, deployable model performance, or broad dominance over all scene-graph planning systems.

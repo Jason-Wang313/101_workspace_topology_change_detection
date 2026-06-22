@@ -1,21 +1,29 @@
 # Experiment Rigor Checklist
 
 - [x] Paper-specific topology-change benchmark.
-- [x] Multiple manipulation/mobile-manipulation tasks.
-- [x] Multiple topology-change families.
-- [x] Multiple stress splits.
-- [x] Strong baselines including topological SLAM/TAMP, graph neural change classification, robust replanning, uncertainty replanning, and occupancy deltas.
-- [x] Oracle upper bound.
-- [x] Seven seeds.
-- [x] Uncertainty intervals.
-- [x] Pairwise seed-level comparison against strongest baseline.
-- [x] Stress sweep.
+- [x] Six manipulation/mobile-manipulation tasks.
+- [x] Eight topology-change regimes.
+- [x] Eight stress and shift splits.
+- [x] Fifteen methods including static scene graphs, occupancy deltas, learned affordance maps, uncertainty replanning, topological SLAM/TAMP, graph neural change classification, robust replanning, conformal risk filtering, particle-filter belief MPC, dynamic scene-graph transformer proxy, neural TAMP, active probing, v4 detector, v5 detector, and oracle.
+- [x] Ten independent seeds.
+- [x] 345,600 main closed-loop rollout rows.
+- [x] 115,200 ablation rollout rows.
+- [x] 288,000 stress-sweep rollout rows.
+- [x] 276,480 fixed-risk rollout rows.
+- [x] Seed uncertainty and pairwise comparisons.
+- [x] Success, invalid-plan, collision/trap, support-failure, topology F1, missed-change false negative, false alarm, latency, calibration, regret, and utility metrics.
 - [x] Core ablations.
+- [x] Stress sweep.
+- [x] Fixed-risk evaluation.
 - [x] Failure cases.
 - [x] Generated figures and LaTeX tables.
+- [x] 25-page manuscript.
+- [x] Bright boxed citation hyperlinks.
+- [x] Downloads-only numbered PDF.
 - [x] Honest terminal gate.
-- [x] Fresh 2026-06-15 continuation rerun logged at `C:/Users/wangz/robotics_massive_pool_paper_factory/logs/101_workspace_topology_change_detection_continuation_rerun_20260615.log`.
 - [ ] Real robot validation.
+- [ ] Accepted high-fidelity simulator benchmark validation.
 - [ ] External benchmark validation.
+- [ ] Calibrated topology-change logs.
 - [ ] Trained checkpoint/model card.
 - [ ] Rollout videos.
